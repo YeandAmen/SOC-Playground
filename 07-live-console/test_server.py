@@ -14,6 +14,14 @@ spec.loader.exec_module(server)
 
 
 class SnapshotTests(unittest.TestCase):
+    def test_trace_keeps_events_beyond_table_limit(self):
+        now = time.time()
+        rows = {"account": [{"event_epoch": now - index, "EventCode": "4720", "_raw": "EventCode=4720"} for index in range(125)]}
+        result = server.build_snapshot(rows, 1)
+        self.assertEqual(len(result["events"]), 100)
+        self.assertEqual(len(result["trace_events"]), 125)
+        self.assertEqual(result["total"], 125)
+
     def test_static_responses_include_browser_security_headers(self):
         console = ThreadingHTTPServer(("127.0.0.1", 0), server.Handler)
         thread = threading.Thread(target=console.serve_forever, daemon=True)

@@ -104,6 +104,8 @@ select { padding: 0 10px; }
 
 .section-head h2 { margin: 0; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 2px; }
 .section-head span { color: var(--muted); font-size: 11px; }
+.capture-controls { display: flex; align-items: center; gap: 12px; }
+.capture-controls select { font-size: 11px; }
 
 .trace-wrap {
   position: relative;
@@ -199,6 +201,8 @@ tr:hover td { background: #1a2023; }
 }
 
 @media (max-width: 430px) {
+  .capture-controls { gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .capture-controls span { display: none; }
   .topbar { height: 58px; }
   .splunk-link { font-size: 10px; }
   h1 { font-size: 21px; }

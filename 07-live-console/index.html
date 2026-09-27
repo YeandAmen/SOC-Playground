@@ -16,7 +16,7 @@
     <div class="tabs" role="tablist" aria-label="View"><button class="tab active" type="button" aria-selected="true" id="traces-tab">TRACES</button><button class="tab" type="button" aria-selected="false" id="stats-tab">STATISTICS</button></div>
     <section class="heading">
       <div><p class="eyebrow">LIVE CAPTURE / SOC_CAPSTONE</p><h1>Observed activity <span id="total-count">0</span></h1><p class="subhead" id="last-update">Connecting to Splunk...</p></div>
-      <div class="controls"><span class="status" id="status"><i></i> CONNECTING</span><label class="time-label" for="hours">WINDOW</label><select id="hours" aria-label="Time window"><option value="1">1 HOUR</option><option value="6">6 HOURS</option><option value="24" selected>24 HOURS</option><option value="72">72 HOURS</option></select><button id="refresh" type="button" title="Refresh now" aria-label="Refresh now">↻</button></div>
+      <div class="controls"><span class="status" id="status"><i></i> CONNECTING</span><label class="time-label" for="hours">SEARCH</label><select id="hours" aria-label="Time window"><option value="1" selected>1 HOUR</option><option value="6">6 HOURS</option><option value="24">24 HOURS</option><option value="72">72 HOURS</option></select><button id="refresh" type="button" title="Refresh now" aria-label="Refresh now">↻</button></div>
     </section>
     <form id="connect-form" class="connect-form" hidden>
       <span>CONNECT TO SPLUNK</span>
@@ -26,11 +26,11 @@
       <small id="connect-error" role="alert"></small>
     </form>
     <section class="trace-section" aria-labelledby="trace-title">
-      <div class="section-head"><h2 id="trace-title">CAPTURE LINE</h2><span id="trace-caption">Event density by simulation</span></div>
+      <div class="section-head"><h2 id="trace-title">CAPTURE LINE</h2><div class="capture-controls"><span id="trace-caption">LIVE CAPTURE / 15 MIN</span><select id="capture-range" aria-label="Capture range"><option value="300">LIVE 5 MIN</option><option value="900" selected>LIVE 15 MIN</option><option value="0">SEARCH WINDOW</option></select></div></div>
       <div class="trace-wrap">
         <canvas id="trace" aria-label="Mirrored waveform of Splunk events over time" role="img"></canvas>
         <div id="trace-tooltip" class="trace-tooltip" hidden></div>
-        <div class="axis"><span id="axis-start">-24h</span><span>WINDOW MIDPOINT</span><span>NOW</span></div>
+        <div class="axis"><span id="axis-start">-15m</span><span id="axis-middle">-7.5m</span><span>NOW</span></div>
       </div>
       <div class="legend"><span><i class="swatch cyan"></i> SSH / Attk101</span><span><i class="swatch amber"></i> ACCOUNT / Attk102</span><span><i class="swatch violet"></i> POWERSHELL / Attk103</span><span><i class="swatch red"></i> LOG CLEAR / Attk104</span></div>
     </section>

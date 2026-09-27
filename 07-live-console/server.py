@@ -162,6 +162,7 @@ def build_snapshot(rows_by_kind, hours):
         "updated_at": now,
         "hours": hours,
         "events": events[:100],
+        "trace_events": [{"time": event["time"], "technique": event["technique"]} for event in events],
         "trace": [dict(item) for item in bins],
         "detections": detections,
         "counts": dict(Counter(event["technique"] for event in events)),
@@ -176,7 +177,7 @@ def build_snapshot(rows_by_kind, hours):
 def snapshot(hours):
     with _cache_lock:
         cached = _cache.get(hours)
-        if cached and time.time() - cached[0] < 10:
+        if cached and time.time() - cached[0] < 3:
             return cached[1]
     rows = {kind: splunk_search(query, hours) for kind, query in SEARCHES.items()}
     result = build_snapshot(rows, hours)

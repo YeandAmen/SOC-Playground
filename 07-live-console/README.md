@@ -18,14 +18,19 @@ instead supply `SPLUNK_PASSWORD` from a secret manager. `SPLUNK_URL`, `SPLUNK_US
 Set `SPLUNK_TLS_VERIFY=1` after installing a trusted certificate for Splunk's
 management endpoint.
 
-The capture line is a centered, smoothed rendering of 60 real event-count bins
-for the selected time window. Smoothing changes only the display shape; totals,
-colors, tables, and detections use the unsmoothed Splunk results. It is not a
-request latency chart. Detections are transparent rules:
+The live capture scrolls continuously at real clock speed. Choose a five- or
+15-minute capture range; each category has its own waveform derived from exact
+event timestamps. Recent events enter from the right and move left as they age.
+Quiet periods remain flat. The search-window overview uses all 60 event-count
+bins for the selected search window. Short smoothing kernels affect only the
+waveform; hover counts, totals and detections use recorded events. If the
+connection fails, scrolling freezes and the status changes to disconnected.
+The animation is a density view, not a request latency chart or severity score.
+Detections are transparent rules:
 10 or more SSH failures from one source within five minutes, or the presence
 of account creation/admin group changes, a PowerShell download command, or a
-Security log clear event. Results refresh every 15 seconds and are cached by
-the server for 10 seconds. Each event class is capped at 250 results; the UI
+Security log clear event. Results are polled every five seconds and cached by
+the server for three seconds. Each event class is capped at 250 results; the UI
 flags a capped result set. The app does not fabricate events or scores.
 
 The console reads `linux_secure`, `WinEventLog:Security`, and Sysmon Operational

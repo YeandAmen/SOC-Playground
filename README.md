@@ -48,7 +48,7 @@ installers, licenses, OS images, or production credentials.
 6. Run `bash 07-live-console/start-macos.sh` on the Mac, open
    `http://127.0.0.1:8765`, and enter the Splunk admin password in the local
    connection form. The console searches Splunk
-   every 15 seconds. The regular Splunk UI remains at
+   every five seconds while the capture scrolls continuously. The regular Splunk UI remains at
    `http://127.0.0.1:8000`.
 
 ## Mac to VM SSH

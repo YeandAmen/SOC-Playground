@@ -7,14 +7,19 @@
 $ErrorActionPreference = 'Stop'
 
 # ---- Config (override with env vars if needed) -----------------------------
-$SplunkHost   = if ($env:SPLUNK_HOST_IP) { $env:SPLUNK_HOST_IP } else { '<mac-ip>' }
+$SplunkHost   = if ($env:SPLUNK_HOST_IP) { $env:SPLUNK_HOST_IP } else { Read-Host 'Mac/Splunk IP reachable from this VM' }
 $ReceivePort  = if ($env:SPLUNK_RECEIVE_PORT) { $env:SPLUNK_RECEIVE_PORT } else { '9997' }
-$UF_INDEX     = if ($env:SPLUNK_INDEX) { $env:SPLUNK_INDEX } else { 'soc_capstone' }
+$UFIndex      = if ($env:SPLUNK_INDEX) { $env:SPLUNK_INDEX } else { 'soc_capstone' }
 $UFVersion    = '10.4.3'
 $UFBuild      = '4174a2deda5d'
 $UFUrl        = "https://download.splunk.com/products/universalforwarder/releases/$UFVersion/windows/splunkforwarder-$UFVersion-$UFBuild-windows-x64.msi"
 $UFMsi        = "$env:TEMP\splunkforwarder.msi"
 $UFHome       = "C:\Program Files\SplunkUniversalForwarder"
+
+$parsedSplunkHost = $null
+if (-not [System.Net.IPAddress]::TryParse($SplunkHost, [ref]$parsedSplunkHost)) {
+    throw "SPLUNK_HOST_IP must be a valid IP address, received: $SplunkHost"
+}
 
 Write-Host "[*] Splunk indexer target : $SplunkHost`:$ReceivePort" -ForegroundColor Cyan
 Write-Host "[*] Index                 : $UFIndex" -ForegroundColor Cyan

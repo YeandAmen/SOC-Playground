@@ -1,5 +1,7 @@
 # SOC Playground
 
+Built and maintained by [YeandAmen](https://github.com/YeandAmen).
+
 A reproducible SOC lab with a Mac running Splunk Enterprise, a Windows 11
 endpoint, and a Kali Linux endpoint on one UTM virtual network. Both VMs send
 events to the Mac. Attack scripts produce lab telemetry; saved searches, a
@@ -13,12 +15,10 @@ Splunk dashboard, and the live trace console show what Splunk actually ingests.
 | Windows VM | `<windows-ip>` | Sysmon, Splunk Universal Forwarder, OpenSSH Server | Monitored endpoint |
 | Kali VM | `<kali-ip>` | Splunk Universal Forwarder, OpenSSH Server | Monitored endpoint and lab attack machine |
 
-The IPs in this repo (`192.168.64.x`) are examples from the original UTM lab.
-Clone users must substitute their own VM addresses. Set the `SPLUNK_HOST_IP`
-environment variable for forwarding (default <mac-ip>). All Splunk data stays
-local to the host — the console binds to loopback and holds admin credentials
-only in server memory. To host the live console publicly would require removing
-credential handling; this repo is designed for local lab use only.
+Addresses are intentionally not hard-coded. Every clone must use the addresses
+from its own UTM network and set `SPLUNK_HOST_IP` on each VM before installing
+the forwarder. All Splunk data stays local to the host: the console binds to
+loopback and holds credentials only in server memory.
 The repo contains scripts and configuration, not VM disk images, Splunk
 installers, licenses, OS images, or production credentials.
 
@@ -38,7 +38,8 @@ installers, licenses, OS images, or production credentials.
    second script prompts for a local forwarder admin password, copies
    `inputs.conf`, uses LocalSystem for Sysmon access, and restarts the service.
    Run `03-verify-forwarder.ps1` to check local forwarding.
-4. On Kali, run `sudo bash 03-linux-endpoint/setup-uf-kali.sh`. It installs the
+4. On Kali, run
+   `sudo SPLUNK_HOST_IP=<mac-ip> bash 03-linux-endpoint/setup-uf-kali.sh`. It installs the
    Universal Forwarder and monitors `/var/log/auth.log` and `/var/log/syslog`.
 5. On the Mac, run `bash 05-detection/deploy-macos.sh` to install the saved
    searches, Splunk dashboard, and benign PowerShell payload. This restarts
@@ -68,9 +69,9 @@ install the Mac helper:
 
 ```bash
 python3 -m pip install -r requirements.txt
-python3 scripts/lab-ssh.py kali --user YOUR_KALI_USER --command 'hostname'
-python3 scripts/lab-ssh.py windows --user YOUR_WINDOWS_USER --command 'hostname'
-python3 scripts/lab-ssh.py windows --user YOUR_WINDOWS_USER --put 04-attacks/Attk103_psuedoattacks.ps1 'C:/SOC-Capstone/Attk103_psuedoattacks.ps1'
+python3 scripts/lab-ssh.py kali --ip <kali-ip> --user YOUR_KALI_USER --command 'hostname'
+python3 scripts/lab-ssh.py windows --ip <windows-ip> --user YOUR_WINDOWS_USER --command 'hostname'
+python3 scripts/lab-ssh.py windows --ip <windows-ip> --user YOUR_WINDOWS_USER --put 04-attacks/Attk103_psuedoattacks.ps1 'C:/SOC-Playground/Attk103_psuedoattacks.ps1'
 ```
 
 The helper uses Paramiko because password login through the Mac's OpenSSH
@@ -98,9 +99,29 @@ the benign marker hosted in the Splunk app. The latter requires Windows to
 reach Mac port 8000. `04-attacks/README.md` has the attack detail and cleanup.
 No real password, timeline log, VM image, or Splunk data is committed.
 
+## What localhost means
+
+`127.0.0.1` always means the computer running the command. After cloning this
+repo, start Splunk and `07-live-console/start-macos.sh` on the same Mac, then
+open `http://127.0.0.1:8765` on that Mac. It does not point back to the original
+author's computer and it is not a public website.
+
+GitHub Pages can host static files, but this console also needs its Python
+bridge and a private Splunk management connection. For free remote access,
+keep both services bound to loopback and forward the console over SSH:
+
+```bash
+ssh -L 8765:127.0.0.1:8765 YOUR_MAC_USER@YOUR_MAC_ADDRESS
+```
+
+The remote computer can then open `http://127.0.0.1:8765` through the encrypted
+SSH session. Do not expose ports 8765 or 8089 directly to the internet. A public
+deployment needs authentication, TLS, a least-privilege Splunk service account,
+and a backend host that can reach Splunk; that is a separate production design.
+
 ## Read the results
 
-- Splunk dashboard: **SOC Capstone - Attack Detection Dashboard** in the
+- Splunk dashboard: **SOC Playground - Attack Detection Dashboard** in the
   `soc_capstone_detections` app.
 - Live trace: `http://127.0.0.1:8765`; chart points are observed event counts,
   with rule matches and a timestamped event table. Counts are matching

@@ -17,7 +17,7 @@ echo -e "[permissions]\naccess = read\nexport = system" | sudo tee "$APP/metadat
 ```
 
 Then open **Settings → Searches, reports, and alerts** (saved searches) and
-**Dashboards → SOC Capstone — Attack Detection Dashboard**.
+**Dashboards → SOC Playground — Attack Detection Dashboard**.
 
 ## Why these are real detections, not raw searches
 - Each search filters to the dedicated `soc_capstone` index + correct sourcetype,

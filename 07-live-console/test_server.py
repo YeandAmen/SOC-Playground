@@ -3,6 +3,7 @@ import json
 import threading
 import time
 import unittest
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -13,6 +14,18 @@ spec.loader.exec_module(server)
 
 
 class SnapshotTests(unittest.TestCase):
+    def test_static_responses_include_browser_security_headers(self):
+        console = ThreadingHTTPServer(("127.0.0.1", 0), server.Handler)
+        thread = threading.Thread(target=console.serve_forever, daemon=True)
+        thread.start()
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:{console.server_port}/") as response:
+                self.assertEqual(response.headers["X-Frame-Options"], "DENY")
+                self.assertIn("default-src 'self'", response.headers["Content-Security-Policy"])
+        finally:
+            console.shutdown()
+            console.server_close()
+
     def test_real_event_shapes_create_detections_and_trace(self):
         now = time.time()
         stamp = lambda seconds: __import__("datetime").datetime.fromtimestamp(seconds, __import__("datetime").timezone.utc).isoformat()

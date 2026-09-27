@@ -9,7 +9,7 @@ import sys
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("host", choices=("kali", "windows"))
-    parser.add_argument("--ip", help="override the default VM address")
+    parser.add_argument("--ip", required=True, help="VM address on your lab network")
     parser.add_argument("--user", required=True)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--command", help="remote command to run")
@@ -22,7 +22,7 @@ def main():
     except ImportError:
         parser.error("Install dependency: python3 -m pip install -r requirements.txt")
 
-    address = args.ip or {"kali": "<kali-ip>", "windows": "<windows-ip>"}[args.host]
+    address = args.ip
     password = getpass.getpass(f"{args.user}@{address} SSH password: ")
     client = paramiko.SSHClient()
     client.load_system_host_keys()

@@ -3,9 +3,14 @@
 # receiver is reachable, Sysmon is producing events, and the forwarder has
 # actually shipped bytes to the indexer. Run on the Windows VM.
 $ErrorActionPreference = 'Continue'
-$SplunkHost  = if ($env:SPLUNK_HOST_IP) { $env:SPLUNK_HOST_IP } else { '<mac-ip>' }
+$SplunkHost  = if ($env:SPLUNK_HOST_IP) { $env:SPLUNK_HOST_IP } else { Read-Host 'Mac/Splunk IP reachable from this VM' }
 $ReceivePort = if ($env:SPLUNK_RECEIVE_PORT) { $env:SPLUNK_RECEIVE_PORT } else { '9997' }
 $UFHome      = "C:\Program Files\SplunkUniversalForwarder"
+
+$parsedSplunkHost = $null
+if (-not [System.Net.IPAddress]::TryParse($SplunkHost, [ref]$parsedSplunkHost)) {
+    throw "SPLUNK_HOST_IP must be a valid IP address, received: $SplunkHost"
+}
 
 function Check($label, $ok, $detail='') {
     $c = if ($ok) { 'Green' } else { 'Red' }

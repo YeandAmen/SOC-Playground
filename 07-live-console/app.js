@@ -2,12 +2,39 @@ const $ = id => document.getElementById(id);
 const colors = { 'Attk101': '#65e7d1', 'Attk102': '#eab45e', 'Attk103': '#94a8ff', 'Attk104': '#ff777c' };
 let current = null;
 let selectedHours = 24;
+let hoverBin = null;
 
 function node(tag, text, cls) {
   const element = document.createElement(tag);
   if (text !== undefined) element.textContent = text;
   if (cls) element.className = cls;
   return element;
+}
+
+function smooth(values, passes = 3) {
+  let output = values.slice();
+  for (let pass = 0; pass < passes; pass += 1) {
+    output = output.map((value, index) => {
+      const previous = output[Math.max(0, index - 1)];
+      const next = output[Math.min(output.length - 1, index + 1)];
+      return previous * 0.24 + value * 0.52 + next * 0.24;
+    });
+  }
+  return output;
+}
+
+function interpolate(values, position) {
+  const left = Math.floor(position);
+  const right = Math.min(values.length - 1, left + 1);
+  const amount = position - left;
+  return values[left] * (1 - amount) + values[right] * amount;
+}
+
+function traceSeries(bins) {
+  return Object.keys(colors).reduce((series, technique) => {
+    series[technique] = smooth(bins.map(bin => bin[technique] || 0));
+    return series;
+  }, {});
 }
 
 function drawTrace() {
@@ -19,36 +46,103 @@ function drawTrace() {
   const ctx = canvas.getContext('2d');
   ctx.scale(ratio, ratio);
   const width = rect.width, height = rect.height;
+  const center = Math.round(height / 2);
   ctx.clearRect(0, 0, width, height);
-  ctx.strokeStyle = '#323b42'; ctx.lineWidth = 1;
-  for (let i = 0; i <= 4; i++) {
-    const y = 16 + (height - 32) * i / 4;
+  ctx.strokeStyle = '#2c353b';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 8; i += 1) {
+    const x = Math.round(width * i / 8) + 0.5;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+  }
+  for (const offset of [-0.72, -0.36, 0, 0.36, 0.72]) {
+    const y = Math.round(center + offset * (center - 14)) + 0.5;
+    ctx.strokeStyle = offset === 0 ? '#718089' : '#2c353b';
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
   }
+
   const bins = current?.trace || Array.from({length: 60}, () => ({}));
   if (!current?.total) {
-    ctx.beginPath(); ctx.moveTo(0, height - 20); ctx.lineTo(width, height - 20);
-    ctx.strokeStyle = '#526068'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, center); ctx.lineTo(width, center);
+    ctx.strokeStyle = '#718089'; ctx.lineWidth = 1; ctx.stroke();
     return;
   }
-  const max = Math.max(1, ...bins.map(bin => Object.values(bin).reduce((a,b) => a + b, 0)));
-  for (const [technique, color] of Object.entries(colors)) {
-    if (!bins.some(bin => bin[technique])) continue;
-    ctx.beginPath();
-    bins.forEach((bin, i) => {
-      const value = bin[technique] || 0;
-      const x = i / 59 * width;
-      const y = height - 20 - value / max * (height - 42);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowColor = color; ctx.shadowBlur = 9; ctx.stroke(); ctx.shadowBlur = 0;
-    bins.forEach((bin, i) => {
-      if (!bin[technique]) return;
-      const x = i / 59 * width;
-      const y = height - 20 - bin[technique] / max * (height - 42);
-      ctx.fillStyle = color; ctx.fillRect(x - 2, y - 2, 4, 4);
-    });
+
+  const series = traceSeries(bins);
+  const totals = bins.map((_, index) => Object.values(series).reduce((sum, values) => sum + values[index], 0));
+  const max = Math.max(1, ...totals);
+  const samples = [];
+  const step = Math.max(2, Math.round(width / 360));
+  for (let x = 0; x <= width; x += step) {
+    const position = x / width * (bins.length - 1);
+    const values = Object.entries(series).map(([technique, points]) => [technique, interpolate(points, position)]);
+    const total = values.reduce((sum, item) => sum + item[1], 0);
+    const dominant = values.reduce((best, item) => item[1] > best[1] ? item : best, values[0]);
+    const amplitude = total ? 3 + Math.pow(total / max, 0.62) * (center - 17) : 1;
+    samples.push({x, amplitude, color: colors[dominant[0]], total});
   }
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (const sample of samples) {
+    if (!sample.total) continue;
+    const gradient = ctx.createLinearGradient(0, center - sample.amplitude, 0, center + sample.amplitude);
+    gradient.addColorStop(0, `${sample.color}18`);
+    gradient.addColorStop(0.5, `${sample.color}d8`);
+    gradient.addColorStop(1, `${sample.color}18`);
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(sample.x, center - sample.amplitude);
+    ctx.lineTo(sample.x, center + sample.amplitude);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  for (let index = 1; index < samples.length; index += 1) {
+    const previous = samples[index - 1];
+    const sample = samples[index];
+    if (!previous.total && !sample.total) continue;
+    ctx.strokeStyle = sample.color;
+    ctx.lineWidth = 1.25;
+    ctx.shadowColor = sample.color;
+    ctx.shadowBlur = 7;
+    ctx.beginPath();
+    ctx.moveTo(previous.x, center - previous.amplitude);
+    ctx.lineTo(sample.x, center - sample.amplitude);
+    ctx.moveTo(previous.x, center + previous.amplitude);
+    ctx.lineTo(sample.x, center + sample.amplitude);
+    ctx.stroke();
+  }
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = '#e4ffff';
+  ctx.globalAlpha = 0.74;
+  ctx.beginPath(); ctx.moveTo(0, center); ctx.lineTo(width, center); ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  if (hoverBin !== null) {
+    const x = hoverBin / (bins.length - 1) * width;
+    ctx.strokeStyle = '#dce9ed';
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+function updateTraceTooltip(event) {
+  if (!current?.trace?.length) return;
+  const canvas = $('trace');
+  const rect = canvas.getBoundingClientRect();
+  hoverBin = Math.max(0, Math.min(59, Math.round((event.clientX - rect.left) / rect.width * 59)));
+  const bin = current.trace[hoverBin] || {};
+  const minutesAgo = Math.round((59 - hoverBin) / 59 * current.hours * 60);
+  const tooltip = $('trace-tooltip');
+  const entries = Object.entries(colors).filter(([technique]) => bin[technique]).map(([technique]) => `${technique} ${bin[technique]}`);
+  tooltip.textContent = `${minutesAgo ? `${minutesAgo}m ago` : 'now'} / ${entries.join(' / ') || 'no events'}`;
+  tooltip.hidden = false;
+  const left = Math.max(8, Math.min(rect.width - tooltip.offsetWidth - 8, event.clientX - rect.left + 12));
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${Math.max(8, event.clientY - rect.top - 34)}px`;
+  drawTrace();
 }
 
 function render(data) {
@@ -142,5 +236,7 @@ function setView(view) {
 $('stats-tab').addEventListener('click', () => setView('stats'));
 $('traces-tab').addEventListener('click', () => setView('traces'));
 window.addEventListener('resize', drawTrace);
+$('trace').addEventListener('pointermove', updateTraceTooltip);
+$('trace').addEventListener('pointerleave', () => { hoverBin = null; $('trace-tooltip').hidden = true; drawTrace(); });
 refresh();
 setInterval(refresh, 15000);

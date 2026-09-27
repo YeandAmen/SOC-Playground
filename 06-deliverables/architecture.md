@@ -6,7 +6,7 @@ Copy this into draw.io (or Mermaid) to produce the diagram for the report.
 
 ```mermaid
 flowchart LR
-    subgraph UTM["UTM Shared Network 192.168.64.0/24"]
+    subgraph UTM["UTM Shared Network <utm-subnet>"]
         MAC["macOS Host\nSplunk Enterprise 10.2.6\nIndexer + Search Head\n<mac-ip>\n:8000 web  :9997 recv"]
         WIN["Windows 11 VM\nVictim endpoint\n<windows-ip>\nSysmon + UF"]
         KALI["Kali Linux VM\nSSH test target + monitored endpoint\n<kali-ip>\nUF + OpenSSH"]
@@ -40,6 +40,6 @@ flowchart LR
 3. Mac → Kali : SSH password attempts (Attk101); Mac → Windows Splunk Web: benign PowerShell payload (Attk103).
 4. SOC analyst → `http://<mac-ip>:8000` — Splunk searches + dashboard; `http://127.0.0.1:8765` — live trace console.
 
-**Security boundary:** all traffic stays on the UTM 192.168.64.0/24 isolated
+**Security boundary:** all traffic stays on the clone owner's isolated UTM
 virtual network; no exposure to the host's physical LAN/WAN except Splunk
 download/update traffic from the Mac.

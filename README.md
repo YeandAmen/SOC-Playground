@@ -1,7 +1,5 @@
 # SOC Playground
 
-Built and maintained by [YeandAmen](https://github.com/YeandAmen).
-
 A reproducible SOC lab with a Mac running Splunk Enterprise, a Windows 11
 endpoint, and a Kali Linux endpoint on one UTM virtual network. Both VMs send
 events to the Mac. Attack scripts produce lab telemetry; saved searches, a

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <dashboard>
-  <label>SOC Playground — Attack Detection Dashboard</label>
+  <label>SOC Capstone — Attack Detection Dashboard</label>
   <description>Real SPL detections for the simulated pseudo-attack techniques. Proof of ingestion and detection in one view.</description>
 
   <!-- ===== Attk101 Brute Force ===== -->
@@ -10,7 +10,7 @@
       <chart>
         <search>
           <query>index=soc_capstone sourcetype=linux_secure "Failed password"
-| stats count by src
+| stats count by host
 | sort - count
 | head 10</query>
           <earliest>-24h</earliest>
@@ -27,7 +27,7 @@
         <search>
           <query>index=soc_capstone sourcetype=WinEventLog:Security EventCode=4625
 | stats count, dc(Account_Name) as accounts_tried, values(Account_Name) as users
-  by Source_Network_Address
+  by host
 | where count &gt;= 5
 | sort - count</query>
           <earliest>-24h</earliest>
@@ -92,8 +92,8 @@
       <table>
         <search>
           <query>index=soc_capstone ((sourcetype=WinEventLog:Security EventCode=1102)
-  OR (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational EventID=4))
-| table _time, host, EventCode, Computer, User
+  OR (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID>4<"))
+| table _time host
 | sort - _time</query>
           <earliest>-24h</earliest>
           <latest>now</latest>

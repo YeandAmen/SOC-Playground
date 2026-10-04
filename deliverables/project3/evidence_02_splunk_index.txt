@@ -1,0 +1,9 @@
+=== SPLUNK INDEX STATS ===
+     host                           sourcetype                      count
+--------------- --------------------------------------------------- -----
+WIN-JCNJR9HDAMK WinEventLog:Security                                13065
+WIN-JCNJR9HDAMK XmlWinEventLog:Microsoft-Windows-Sysmon/Operational 12498
+kali            syslog                                              12324
+WIN-JCNJR9HDAMK WinEventLog:System                                   4491
+kali            linux_secure                                          842
+WIN-JCNJR9HDAMK WinEventLog:Application                               328

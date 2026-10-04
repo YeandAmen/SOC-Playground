@@ -1,0 +1,11 @@
+=== SIGNALSCOPE DETECTIONS ===
+Total matching events: 18
+Hosts: ['WIN-JCNJR9HDAMK', 'kali']
+Active detections: 3
+  - Attk101: SSH failure burst (10+ failures from one source within five minutes)
+  - Attk102: Account change (2 matching event(s) in selected window)
+  - Attk103: PowerShell download (1 matching event(s) in selected window)
+Events breakdown:
+  Attk101: 15 events
+  Attk102: 2 events
+  Attk103: 1 events

@@ -1,0 +1,9 @@
+id: SIM-004
+attack: {label: Attk104, tactic: defense_evasion, name: "Clear Windows Security log"}
+tool: {name: wevtutil, file: "04-attacks/Attk104_psuedoattacks.ps1", command: "wevtutil cl Security"}
+target: {host: WIN-JCNJR9HDAMK, ip: 192.168.64.2}
+expected_telemetry:
+  - {source: WinEventLog:Security, event_id: 1102}
+  - {source: XmlWinEventLog:Microsoft-Windows-Sysmon/Operational, event_id: 4}
+expected_detection: {rule_id: RULE-ATTK104-001, max_ttd_seconds: 120}
+verdict: null

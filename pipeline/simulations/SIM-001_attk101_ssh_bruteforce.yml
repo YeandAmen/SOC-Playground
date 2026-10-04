@@ -1,0 +1,9 @@
+id: SIM-001
+attack: {label: Attk101, tactic: credential_access, name: "SSH password brute force"}
+tool: {name: paramiko, file: "04-attacks/Attk101_psuedoattacks.py", command: "python3 Attk101_psuedoattacks.py --target <host> --user <user> --wordlist wordlist.txt --delay 1.5"}
+target: {host: kali, ip: 192.168.64.4, user: medusa}
+expected_telemetry:
+  - {source: linux_secure, must_contain: {msg: "*Failed password*"}}
+  - {source: linux_secure, must_contain: {msg: "*Accepted password*"}}
+expected_detection: {rule_id: RULE-ATTK101-001, max_ttd_seconds: 60}
+verdict: null

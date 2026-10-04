@@ -1,0 +1,34 @@
+{
+  "SIM-001": {
+    "simulation": "SSH password brute force",
+    "expected_telemetry": [
+      {"source": "linux_secure", "condition": "msg CONTAINS 'Failed password'", "min_count": 10},
+      {"source": "linux_secure", "condition": "msg CONTAINS 'Accepted password'", "min_count": 1}
+    ],
+    "expected_detection": {"rule_id": "RULE-ATTK101-001", "max_ttd_seconds": 60}
+  },
+  "SIM-002": {
+    "simulation": "Hidden local admin creation",
+    "expected_telemetry": [
+      {"source": "WinEventLog:Security", "event_id": 4720, "min_count": 1},
+      {"source": "WinEventLog:Security", "event_id": 4732, "min_count": 1}
+    ],
+    "expected_detection": {"rule_id": "RULE-ATTK102-001", "max_ttd_seconds": 120}
+  },
+  "SIM-003": {
+    "simulation": "PowerShell download and execute",
+    "expected_telemetry": [
+      {"source": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational", "event_id": 1, "field": "CommandLine", "contains": "DownloadString", "min_count": 1},
+      {"source": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational", "event_id": 3, "field": "DestIp", "value": "192.168.64.1", "min_count": 1}
+    ],
+    "expected_detection": {"rule_id": "RULE-ATTK103-001", "max_ttd_seconds": 120}
+  },
+  "SIM-004": {
+    "simulation": "Clear Windows Security log",
+    "expected_telemetry": [
+      {"source": "WinEventLog:Security", "event_id": 1102, "min_count": 1},
+      {"source": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational", "event_id": 4, "min_count": 1}
+    ],
+    "expected_detection": {"rule_id": "RULE-ATTK104-001", "max_ttd_seconds": 120}
+  }
+}

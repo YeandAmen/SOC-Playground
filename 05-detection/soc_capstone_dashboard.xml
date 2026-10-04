@@ -22,13 +22,11 @@
       </chart>
     </panel>
     <panel>
-      <title>Attk101 — Windows 4625 failed logons — top source</title>
+<title>Ingestion — events in last 24h by sourcetype</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=WinEventLog:Security EventCode=4625
-| stats count, dc(Account_Name) as accounts_tried, values(Account_Name) as users
-  by host
-| where count &gt;= 5
+          <query>index=soc_capstone earliest=-24h
+| stats count by sourcetype
 | sort - count</query>
           <earliest>-24h</earliest>
           <latest>now</latest>
@@ -60,11 +58,9 @@
       <title>Attk103 — PowerShell download cradle (Sysmon EID 1)</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational EventID=1
-(Image="*powershell.exe" OR Image="*pwsh.exe")
-(CommandLine="*DownloadString*" OR CommandLine="*Invoke-WebRequest*" OR CommandLine="*Net.WebClient*" OR CommandLine="*EncodedCommand*")
-| table _time, host, User, Image, ParentImage, CommandLine
-| sort - _time</query>
+          <query>index=soc_capstone DownloadString earliest=-24h
+| stats count by host, sourcetype
+| sort - count</query>
           <earliest>-24h</earliest>
           <latest>now</latest>
         </search>
@@ -74,10 +70,9 @@
       <title>Attk103 — Network connections from PowerShell (Sysmon EID 3)</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational EventID=3
-(Image="*powershell.exe" OR Image="*pwsh.exe")
-| table _time, host, Image, DestinationIp, DestinationPort, DestinationHostname
-| sort - _time</query>
+          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational powershell.exe earliest=-24h
+| stats count by host
+| sort - count</query>
           <earliest>-24h</earliest>
           <latest>now</latest>
         </search>
@@ -92,7 +87,7 @@
       <table>
         <search>
           <query>index=soc_capstone ((sourcetype=WinEventLog:Security EventCode=1102)
-  OR (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID>4<"))
+  OR (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;4&lt;"))
 | table _time host
 | sort - _time</query>
           <earliest>-24h</earliest>

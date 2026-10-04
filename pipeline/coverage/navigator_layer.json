@@ -1,0 +1,27 @@
+{
+  "name": "SOC-Playground Detection Coverage",
+  "version": "1.0",
+  "domain": "enterprise-attack",
+  "techniques": [
+    {
+      "techniqueID": "Attk101",
+      "color": "#2ecc71",
+      "comment": "SIM-001: SSH password brute force \u2014 detected"
+    },
+    {
+      "techniqueID": "Attk102",
+      "color": "#2ecc71",
+      "comment": "SIM-002: Hidden local admin creation \u2014 detected"
+    },
+    {
+      "techniqueID": "Attk103",
+      "color": "#2ecc71",
+      "comment": "SIM-003: PowerShell download and execute \u2014 detected"
+    },
+    {
+      "techniqueID": "Attk104",
+      "color": "#2ecc71",
+      "comment": "SIM-004: Clear Windows Security log \u2014 detected"
+    }
+  ]
+}

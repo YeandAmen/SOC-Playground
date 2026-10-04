@@ -1,0 +1,9 @@
+id: SIM-002
+attack: {label: Attk102, tactic: persistence, name: "Hidden local admin creation"}
+tool: {name: "net user + net localgroup", file: "04-attacks/Attk102_psuedoattacks.ps1", command: "net user <name> <password> /add && net localgroup Administrators <name> /add"}
+target: {host: WIN-JCNJR9HDAMK, ip: 192.168.64.2}
+expected_telemetry:
+  - {source: WinEventLog:Security, event_id: 4720}
+  - {source: WinEventLog:Security, event_id: 4732}
+expected_detection: {rule_id: RULE-ATTK102-001, max_ttd_seconds: 120}
+verdict: null

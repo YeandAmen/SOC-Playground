@@ -1,0 +1,190 @@
+[
+  {
+    "sim_id": "SIM-001",
+    "attack": {
+      "label": "Attk101",
+      "tactic": "credential_access",
+      "name": "SSH password brute force"
+    },
+    "verdict": "detected",
+    "telemetry_checks": [
+      {
+        "check": {
+          "source": "linux_secure",
+          "condition": "msg CONTAINS 'Failed password'",
+          "min_count": 10
+        },
+        "found": true,
+        "query": "index=soc_capstone sourcetype=linux_secure \"Failed password\" earliest=-24h | stats count",
+        "response": [
+          "count",
+          "-----",
+          "   28"
+        ]
+      },
+      {
+        "check": {
+          "source": "linux_secure",
+          "condition": "msg CONTAINS 'Accepted password'",
+          "min_count": 1
+        },
+        "found": true,
+        "query": "index=soc_capstone sourcetype=linux_secure \"Accepted password\" earliest=-24h | stats count",
+        "response": [
+          "count",
+          "-----",
+          "   11"
+        ]
+      }
+    ],
+    "detection_check": {
+      "rule_id": "RULE-ATTK101-001",
+      "found": true,
+      "note": "rule deployed"
+    },
+    "detail": "",
+    "timestamp": "2026-10-04T18-10-16Z"
+  },
+  {
+    "sim_id": "SIM-002",
+    "attack": {
+      "label": "Attk102",
+      "tactic": "persistence",
+      "name": "Hidden local admin creation"
+    },
+    "verdict": "detected",
+    "telemetry_checks": [
+      {
+        "check": {
+          "source": "WinEventLog:Security",
+          "event_id": 4720,
+          "min_count": 1
+        },
+        "found": true,
+        "query": "index=soc_capstone sourcetype=WinEventLog:Security EventCode=4720 earliest=-24h | stats count",
+        "response": [
+          "count",
+          "-----",
+          "    2"
+        ]
+      },
+      {
+        "check": {
+          "source": "WinEventLog:Security",
+          "event_id": 4732,
+          "min_count": 1
+        },
+        "found": true,
+        "query": "index=soc_capstone sourcetype=WinEventLog:Security EventCode=4732 earliest=-24h | stats count",
+        "response": [
+          "count",
+          "-----",
+          "    4"
+        ]
+      }
+    ],
+    "detection_check": {
+      "rule_id": "RULE-ATTK102-001",
+      "found": true,
+      "note": "rule deployed"
+    },
+    "detail": "",
+    "timestamp": "2026-10-04T18-10-16Z"
+  },
+  {
+    "sim_id": "SIM-003",
+    "attack": {
+      "label": "Attk103",
+      "tactic": "execution",
+      "name": "PowerShell download and execute"
+    },
+    "verdict": "detected",
+    "telemetry_checks": [
+      {
+        "check": {
+          "source": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational",
+          "event_id": 1,
+          "field": "CommandLine",
+          "contains": "DownloadString",
+          "min_count": 1
+        },
+        "found": true,
+        "query": "index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational \"EventID>1<\" earliest=-24h | stats count",
+        "response": [
+          "count",
+          "-----",
+          "  725"
+        ]
+      },
+      {
+        "check": {
+          "source": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational",
+          "event_id": 3,
+          "field": "DestIp",
+          "value": "192.168.64.1",
+          "min_count": 1
+        },
+        "found": true,
+        "query": "index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational \"EventID>3<\" earliest=-24h | stats count",
+        "response": [
+          "count",
+          "-----",
+          "   19"
+        ]
+      }
+    ],
+    "detection_check": {
+      "rule_id": "RULE-ATTK103-001",
+      "found": true,
+      "note": "rule deployed"
+    },
+    "detail": "",
+    "timestamp": "2026-10-04T18-10-16Z"
+  },
+  {
+    "sim_id": "SIM-004",
+    "attack": {
+      "label": "Attk104",
+      "tactic": "defense_evasion",
+      "name": "Clear Windows Security log"
+    },
+    "verdict": "detected",
+    "telemetry_checks": [
+      {
+        "check": {
+          "source": "WinEventLog:Security",
+          "event_id": 1102,
+          "min_count": 1
+        },
+        "found": true,
+        "query": "index=soc_capstone sourcetype=WinEventLog:Security EventCode=1102 earliest=-24h | stats count",
+        "response": [
+          "count",
+          "-----",
+          "    0"
+        ]
+      },
+      {
+        "check": {
+          "source": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational",
+          "event_id": 4,
+          "min_count": 1
+        },
+        "found": true,
+        "query": "index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational \"EventID>4<\" earliest=-24h | stats count",
+        "response": [
+          "count",
+          "-----",
+          "    1"
+        ]
+      }
+    ],
+    "detection_check": {
+      "rule_id": "RULE-ATTK104-001",
+      "found": true,
+      "note": "rule deployed"
+    },
+    "detail": "",
+    "timestamp": "2026-10-04T18-10-16Z"
+  }
+]

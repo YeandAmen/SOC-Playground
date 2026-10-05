@@ -28,6 +28,7 @@ HOST = os.environ.get("CONSOLE_HOST", "127.0.0.1")
 TLS_VERIFY = os.environ.get("SPLUNK_TLS_VERIFY", "0") == "1"
 
 SEARCHES = {
+    "normal": '(sourcetype=linux_secure "Accepted password") OR (sourcetype=WinEventLog:System "EventID>1<")',
     "ssh": 'sourcetype=linux_secure ("Failed password" OR "Accepted password")',
     "account": 'sourcetype=WinEventLog:Security (EventCode=4720 OR EventCode=4732 OR EventCode=1102)',
     "powershell": 'sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational (DownloadString OR DownloadFile OR Invoke-WebRequest OR Net.WebClient OR EncodedCommand)',
@@ -87,6 +88,8 @@ def parse_time(value):
 def classify(kind, row):
     raw = row.get("_raw", "") or ""
     code = str(row.get("EventCode") or row.get("EventID") or "")
+    if kind == "normal":
+        return ("baseline", "baseline", "info", row.get("host") or "unknown")
     if kind == "ssh":
         failed = "Failed password" in raw
         match = re.search(r"from ([0-9a-fA-F:.]+)", raw)
@@ -121,6 +124,7 @@ def classify(kind, row):
 
 def build_snapshot(rows_by_kind, hours):
     events = []
+    baseline_events = []
     unparsed_time = 0
     for kind, rows in rows_by_kind.items():
         for row in rows:
@@ -132,18 +136,28 @@ def build_snapshot(rows_by_kind, hours):
             if not timestamp:
                 unparsed_time += 1
                 continue
-            events.append({
+            entry = {
                 "time": timestamp,
                 "host": row.get("host") or "unknown",
                 "label": label,
                 "technique": technique,
                 "severity": severity,
                 "actor": actor,
-                "detail": (row.get("CommandLine") or row.get("_raw") or "")[:340],
-            })
+                "detail": "",
+            }
+            if technique == "baseline":
+                baseline_events.append(entry)
+            else:
+                events.append(entry)
     events.sort(key=lambda event: event["time"], reverse=True)
+    baseline_events.sort(key=lambda event: event["time"], reverse=True)
     now = time.time()
     window_start = now - hours * 3600
+    base_bins = [0] * 60
+    for event in baseline_events:
+        index = int((event["time"] - window_start) / (hours * 3600) * 60)
+        if 0 <= index < 60:
+            base_bins[index] += 1
     bins = [Counter() for _ in range(60)]
     for event in events:
         index = int((event["time"] - window_start) / (hours * 3600) * 60)
@@ -162,8 +176,8 @@ def build_snapshot(rows_by_kind, hours):
         "updated_at": now,
         "hours": hours,
         "events": events[:100],
-        "trace_events": [{"time": event["time"], "technique": event["technique"]} for event in events],
         "trace": [dict(item) for item in bins],
+        "baseline_trace": base_bins,
         "detections": detections,
         "counts": dict(Counter(event["technique"] for event in events)),
         "hosts": sorted({event["host"] for event in events}),

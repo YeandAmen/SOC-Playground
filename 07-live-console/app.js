@@ -92,6 +92,25 @@ function drawTrace() {
   if (capture) {
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
+    const baseTrace = current?.baseline_trace;
+    if (baseTrace && baseTrace.some(v => v)) {
+      const baseMax = Math.max(1, ...baseTrace);
+      const baseSec = capture.seconds || current.hours * 3600;
+      const baseStart = capture.end - baseSec;
+      ctx.strokeStyle = '#52606860'; ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      baseTrace.forEach((value, i) => {
+        const x = (i + 0.5) / baseTrace.length * width;
+        const amp = Math.sqrt(value / baseMax) * (center - 14) * 0.3;
+        i === 0 ? ctx.moveTo(x, center - amp) : ctx.lineTo(x, center - amp);
+      });
+      for (let i = baseTrace.length - 1; i >= 0; i -= 1) {
+        const x = (i + 0.5) / baseTrace.length * width;
+        const amp = Math.sqrt(baseTrace[i] / baseMax) * (center - 14) * 0.3;
+        ctx.lineTo(x, center + amp);
+      }
+      ctx.closePath(); ctx.fillStyle = '#52606815'; ctx.fill(); ctx.stroke();
+    }
     for (const [technique, values] of Object.entries(capture.profiles)) {
       const color = colors[technique];
       const points = values.map((value, index) => ({

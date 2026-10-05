@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Continuous detection scanner.
 Queries Splunk for each check, tags red/blue with per-attack timestamps,
-writes detection/status.json, auto-pushes to GitHub.
+writes detection/status.json.
 
 Usage:  python3 detection/scan.py            # one shot
         python3 detection/scan.py --watch    # every 30s
@@ -11,8 +11,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SPLUNK = "/Applications/Splunk/bin/splunk"
-AUTH = "admin:Denymenot2"
+SPLUNK = os.environ.get("SPLUNK_BIN", "/Applications/Splunk/bin/splunk")
+SPLUNK_USER = os.environ.get("SPLUNK_USER", "admin")
+SPLUNK_PASSWORD = os.environ.get("SPLUNK_PASSWORD", "")
 OUT = ROOT / "detection" / "status.json"
 INTERVAL = 30
 
@@ -27,11 +28,13 @@ CHECKS = [
 ]
 
 def splunk(cmd):
+    if not SPLUNK_PASSWORD:
+        raise SystemExit("Set SPLUNK_PASSWORD before running detection/scan.py")
     try:
-        r = subprocess.run([SPLUNK, "search", cmd, "-auth", AUTH], capture_output=True, text=True, timeout=25)
+        r = subprocess.run([SPLUNK, "search", cmd, "-auth", f"{SPLUNK_USER}:{SPLUNK_PASSWORD}"], capture_output=True, text=True, timeout=25)
         out = [l for l in r.stdout.splitlines() if l.strip() and not l.startswith("WARNING") and not l.startswith("INFO")]
         return out
-    except:
+    except subprocess.SubprocessError:
         return []
 
 def get_count(name, query, threshold):
@@ -76,12 +79,12 @@ def scan():
 
 def push():
     os.chdir(ROOT)
-    r = subprocess.run(["git", "remote", "get-url", "origin"], capture_output=True, text=True)
-    url = r.stdout.strip()
-    if "github" in url:
-        subprocess.run(["git", "add", "detection/status.json"], capture_output=True)
-        subprocess.run(["git", "commit", "-m", "s"], capture_output=True)
-        subprocess.run(["git", "push", "origin", "main"], capture_output=True)
+    subprocess.run(["git", "add", "detection/status.json"], capture_output=True)
+    diff = subprocess.run(["git", "diff", "--cached", "--quiet"])
+    if diff.returncode == 0:
+        return
+    subprocess.run(["git", "commit", "-m", "Update generated detection status"], check=False)
+    subprocess.run(["git", "push", "origin", "main"], check=False)
 
 if __name__ == "__main__":
     watch = "--watch" in sys.argv or "-w" in sys.argv

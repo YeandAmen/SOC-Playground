@@ -48,6 +48,12 @@ installers, licenses, OS images, or production credentials.
    connection form. The console searches Splunk
    every five seconds while the capture scrolls continuously. The regular Splunk UI remains at
    `http://127.0.0.1:8000`.
+7. Optional: publish a local detection status file for the console's status
+   tags. This file is generated on each machine and ignored by git:
+
+```bash
+SPLUNK_PASSWORD='your-local-password' python3 detection/scan.py --watch
+```
 
 ## Mac to VM SSH
 

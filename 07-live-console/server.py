@@ -176,6 +176,7 @@ def build_snapshot(rows_by_kind, hours):
         "updated_at": now,
         "hours": hours,
         "events": events[:100],
+        "trace_events": events,
         "trace": [dict(item) for item in bins],
         "baseline_trace": base_bins,
         "detections": detections,

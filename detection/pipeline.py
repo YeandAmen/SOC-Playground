@@ -13,8 +13,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SPLUNK = "/Applications/Splunk/bin/splunk"
-AUTH = "admin:Denymenot2"
+SPLUNK = os.environ.get("SPLUNK_BIN", "/Applications/Splunk/bin/splunk")
+SPLUNK_USER = os.environ.get("SPLUNK_USER", "admin")
+SPLUNK_PASSWORD = os.environ.get("SPLUNK_PASSWORD", "")
+WINDOWS_HOST = os.environ.get("WINDOWS_HOST", "")
+WINDOWS_USER = os.environ.get("WINDOWS_USER", "")
+WINDOWS_PASSWORD = os.environ.get("WINDOWS_PASSWORD", "")
+SSH_TARGET = os.environ.get("SSH_TARGET", "")
+SSH_USER = os.environ.get("SSH_USER", "medusa")
 OUT = ROOT / "detection" / "pipeline_status.json"
 TUNING_LOG = ROOT / "detection" / "tuning_log.json"
 INTERVAL = 120
@@ -28,10 +34,12 @@ CHECKS = [
 ]
 
 def splunk(cmd):
+    if not SPLUNK_PASSWORD:
+        raise SystemExit("Set SPLUNK_PASSWORD before running detection/pipeline.py")
     try:
-        r = subprocess.run([SPLUNK, "search", cmd, "-auth", AUTH], capture_output=True, text=True, timeout=25)
+        r = subprocess.run([SPLUNK, "search", cmd, "-auth", f"{SPLUNK_USER}:{SPLUNK_PASSWORD}"], capture_output=True, text=True, timeout=25)
         return [l for l in r.stdout.splitlines() if l.strip() and not l.startswith("WARNING") and not l.startswith("INFO")]
-    except:
+    except subprocess.SubprocessError:
         return []
 
 def query(q):
@@ -57,20 +65,26 @@ def get_ts(q):
 def run_attack(name):
     """Run the attack script that generates telemetry for this check."""
     if "SSH" in name:
+        if not SSH_TARGET:
+            return ["set SSH_TARGET to run Attk101"]
         r = subprocess.run(["python3", str(ROOT/"04-attacks"/"Attk101_psuedoattacks.py"),
-            "--target", "192.168.64.4", "--user", "medusa",
+            "--target", SSH_TARGET, "--user", SSH_USER,
             "--wordlist", str(ROOT/"04-attacks"/"wordlist.txt"), "--delay", "0.5"],
             capture_output=True, text=True, timeout=120)
         return r.stdout.splitlines()[-2:] if r.stdout else ["no output"]
     if "Account" in name:
-        r = subprocess.run(["sshpass", "-p", "Denymenot2", "ssh", "-o", "StrictHostKeyChecking=no",
-            "-o", "ConnectTimeout=15", "supernova@192.168.64.2",
+        if not all((WINDOWS_HOST, WINDOWS_USER, WINDOWS_PASSWORD)):
+            return ["set WINDOWS_HOST, WINDOWS_USER, and WINDOWS_PASSWORD to run Attk102"]
+        r = subprocess.run(["sshpass", "-p", WINDOWS_PASSWORD, "ssh", "-o", "StrictHostKeyChecking=no",
+            "-o", "ConnectTimeout=15", f"{WINDOWS_USER}@{WINDOWS_HOST}",
             'cmd /c "net user pipetest Capstone2026! /add && net localgroup Administrators pipetest /add"'],
             capture_output=True, text=True, timeout=30)
         return [l for l in r.stdout.splitlines() if l.strip()][-2:]
     if "PS" in name:
-        r = subprocess.run(["sshpass", "-p", "Denymenot2", "ssh", "-o", "StrictHostKeyChecking=no",
-            "-o", "ConnectTimeout=15", "supernova@192.168.64.2",
+        if not all((WINDOWS_HOST, WINDOWS_USER, WINDOWS_PASSWORD)):
+            return ["set WINDOWS_HOST, WINDOWS_USER, and WINDOWS_PASSWORD to run Attk103"]
+        r = subprocess.run(["sshpass", "-p", WINDOWS_PASSWORD, "ssh", "-o", "StrictHostKeyChecking=no",
+            "-o", "ConnectTimeout=15", f"{WINDOWS_USER}@{WINDOWS_HOST}",
             'cmd /c "powershell -ExecutionPolicy Bypass -File C:\\SOC-Capstone\\payload.ps1"'],
             capture_output=True, text=True, timeout=30)
         return [l for l in r.stdout.splitlines() if l.strip()][-2:]
@@ -181,8 +195,11 @@ def cycle(counter=0):
 def push():
     os.chdir(ROOT)
     subprocess.run(["git", "add", "detection/"], capture_output=True)
-    subprocess.run(["git", "commit", "-m", "s"], capture_output=True)
-    subprocess.run(["git", "push", "origin", "main"], capture_output=True)
+    diff = subprocess.run(["git", "diff", "--cached", "--quiet"])
+    if diff.returncode == 0:
+        return
+    subprocess.run(["git", "commit", "-m", "Update generated detection pipeline status"], check=False)
+    subprocess.run(["git", "push", "origin", "main"], check=False)
 
 if __name__ == "__main__":
     watch = "--watch" in sys.argv or "-w" in sys.argv

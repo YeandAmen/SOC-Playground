@@ -258,14 +258,13 @@ $('traces-tab').addEventListener('click', () => setView('traces'));
 $('trace').addEventListener('pointermove', updateTraceTooltip);
 $('trace').addEventListener('pointerleave', () => { hoverFraction = null; $('trace-tooltip').hidden = true; });
 refresh(); setInterval(refresh, 5000); requestAnimationFrame(animate);
-}
 
 async function loadTags() {
   try {
     const r = await fetch('/api/status', {cache:'no-store'});
     const data = await r.json();
     if (data.error) throw new Error(data.error);
-    const c = data.tags || [];
+    const c = data.checks || data.tags || [];
     const html = c.map(t => {
       const dot = t.tag === 'red' ? '&#9679;' : '&#9675;';
       const clr = t.tag === 'red' ? '#ff777c' : '#65e7d1';
@@ -278,3 +277,4 @@ async function loadTags() {
 }
 setInterval(loadTags, 30000);
 loadTags();
+}

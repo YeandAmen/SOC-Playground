@@ -16,6 +16,19 @@ echo -e "[permissions]\naccess = read\nexport = system" | sudo tee "$APP/metadat
 /Applications/Splunk/bin/splunk restart
 ```
 
+## Local detection status
+
+`detection/scan.py` writes `detection/status.json` for the live console status
+tags. That JSON is generated from the clone owner's Splunk data and is ignored
+by git.
+
+```bash
+SPLUNK_PASSWORD='your-local-password' python3 detection/scan.py
+SPLUNK_PASSWORD='your-local-password' python3 detection/scan.py --watch
+```
+
+Use `SPLUNK_USER` and `SPLUNK_BIN` if your Splunk account or binary path differs.
+
 Then open **Settings → Searches, reports, and alerts** (saved searches) and
 **Dashboards → SOC Playground — Attack Detection Dashboard**.
 

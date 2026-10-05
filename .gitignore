@@ -6,4 +6,7 @@ __pycache__/
 .env.*
 !.env.example
 04-attacks/wordlist.txt
+detection/status.json
+detection/pipeline_status.json
+detection/tuning_log.json
 *.bak

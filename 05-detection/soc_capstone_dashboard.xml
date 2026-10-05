@@ -9,13 +9,13 @@
       <title>Attk101 — SSH Brute Force (Linux auth.log) — top source IPs</title>
       <chart>
         <search>
-          <query>index=soc_capstone sourcetype=linux_secure "Failed password" earliest="10/04/2026:00:00:00" latest="10/05/2026:23:59:59"
+          <query>index=soc_capstone sourcetype=linux_secure "Failed password" earliest=-48h@h latest=@h
 | rex field=_raw max_match=1 "from\s+(?&lt;src_ip&gt;\d+\.\d+\.\d+\.\d+)"
 | stats count by src_ip
 | sort - count
 | head 10</query>
-          <earliest>10/04/2026:00:00:00</earliest>
-          <latest>10/05/2026:23:59:59</latest>
+          <earliest>-48h@h</earliest>
+          <latest>@h</latest>
         </search>
         <option name="charting.chart">column</option>
         <option name="charting.axisTitleX.text">Source IP</option>
@@ -26,11 +26,11 @@
       <title>Ingestion over fixed window by sourcetype</title>
       <table>
         <search>
-          <query>index=soc_capstone earliest="10/04/2026:00:00:00" latest="10/05/2026:23:59:59"
+          <query>index=soc_capstone earliest=-48h@h latest=@h
 | stats count by sourcetype
 | sort - count</query>
-          <earliest>10/04/2026:00:00:00</earliest>
-          <latest>10/05/2026:23:59:59</latest>
+          <earliest>-48h@h</earliest>
+          <latest>@h</latest>
         </search>
       </table>
     </panel>
@@ -42,13 +42,13 @@
       <title>Attk101 — SSH failed logins by source IP (Kali)</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=linux_secure "Failed password" earliest="10/04/2026:00:00:00" latest="10/05/2026:23:59:59"
+          <query>index=soc_capstone sourcetype=linux_secure "Failed password" earliest=-48h@h latest=@h
 | rex field=_raw max_match=1 "from\s+(?&lt;src_ip&gt;\d+\.\d+\.\d+\.\d+)"
 | stats count by host, src_ip
 | sort - count
 | head 20</query>
-          <earliest>10/04/2026:00:00:00</earliest>
-          <latest>10/05/2026:23:59:59</latest>
+          <earliest>-48h@h</earliest>
+          <latest>@h</latest>
         </search>
       </table>
     </panel>
@@ -56,15 +56,15 @@
       <title>Windows — Sysmon network connections (EID 3)</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" earliest="10/04/2026:00:00:00" latest="10/05/2026:23:59:59"
+          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" earliest=-48h@h latest=@h
 | rex field=_raw max_match=1 "SourceIp.\&gt;(?&lt;src_ip&gt;[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"
 | rex field=_raw max_match=1 "DestinationIp.\&gt;(?&lt;dest_ip&gt;[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"
 | rex field=_raw max_match=1 "DestinationPort.\&gt;(?&lt;dest_port&gt;[0-9]+)"
 | stats count by host, src_ip, dest_ip, dest_port
 | sort - count
 | head 20</query>
-          <earliest>10/04/2026:00:00:00</earliest>
-          <latest>10/05/2026:23:59:59</latest>
+          <earliest>-48h@h</earliest>
+          <latest>@h</latest>
         </search>
       </table>
     </panel>
@@ -76,15 +76,15 @@
       <title>Attk102 — Local Account Creation (Security 4720) + Admin group adds</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=WinEventLog:Security (EventCode=4720 OR EventCode=4728 OR EventCode=4732) earliest="10/04/2026:00:00:00" latest="10/05/2026:23:59:59"
+          <query>index=soc_capstone sourcetype=WinEventLog:Security (EventCode=4720 OR EventCode=4728 OR EventCode=4732) earliest=-48h@h latest=@h
 | eval action=case(EventCode=="4720","ACCOUNT_CREATED", EventCode=="4728","ADDED_TO_LOCALGROUP", EventCode=="4732","ADDED_TO_GLOBALGROUP")
 | eval actor=mvindex(Account_Name,0)
 | eval target=mvindex(Account_Name,1)
 | eval target=if(target=="-" OR isnull(target),"N/A",target)
 | table _time, host, action, actor, target
 | sort - _time</query>
-          <earliest>10/04/2026:00:00:00</earliest>
-          <latest>10/05/2026:23:59:59</latest>
+          <earliest>-48h@h</earliest>
+          <latest>@h</latest>
         </search>
       </table>
     </panel>
@@ -96,11 +96,11 @@
       <title>Attk103 — PowerShell download cradle (DownloadString)</title>
       <table>
         <search>
-          <query>index=soc_capstone DownloadString earliest="10/04/2026:00:00:00" latest="10/05/2026:23:59:59"
+          <query>index=soc_capstone DownloadString earliest=-48h@h latest=@h
 | stats count by host, sourcetype
 | sort - count</query>
-          <earliest>10/04/2026:00:00:00</earliest>
-          <latest>10/05/2026:23:59:59</latest>
+          <earliest>-48h@h</earliest>
+          <latest>@h</latest>
         </search>
       </table>
     </panel>
@@ -108,11 +108,11 @@
       <title>Attk103 — Sysmon EID 3 network connections</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" earliest="10/04/2026:00:00:00" latest="10/05/2026:23:59:59"
+          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" earliest=-48h@h latest=@h
 | stats count by host
 | sort - count</query>
-          <earliest>10/04/2026:00:00:00</earliest>
-          <latest>10/05/2026:23:59:59</latest>
+          <earliest>-48h@h</earliest>
+          <latest>@h</latest>
         </search>
       </table>
     </panel>
@@ -124,11 +124,11 @@
       <title>Attk104 — Security log cleared (EID 1102 / Sysmon 4)</title>
       <table>
         <search>
-          <query>index=soc_capstone ((sourcetype=WinEventLog:Security EventCode=1102) OR (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;4&lt;")) earliest="10/04/2026:00:00:00" latest="10/05/2026:23:59:59"
+          <query>index=soc_capstone ((sourcetype=WinEventLog:Security EventCode=1102) OR (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;4&lt;")) earliest=-48h@h latest=@h
 | table _time host
 | sort - _time</query>
-          <earliest>10/04/2026:00:00:00</earliest>
-          <latest>10/05/2026:23:59:59</latest>
+          <earliest>-48h@h</earliest>
+          <latest>@h</latest>
         </search>
       </table>
     </panel>
@@ -140,11 +140,11 @@
       <title>Proof of ingestion — event count by sourcetype</title>
       <chart>
         <search>
-          <query>index=soc_capstone earliest="10/04/2026:00:00:00" latest="10/05/2026:23:59:59"
+          <query>index=soc_capstone earliest=-48h@h latest=@h
 | stats count by sourcetype
 | sort - count</query>
-          <earliest>10/04/2026:00:00:00</earliest>
-          <latest>10/05/2026:23:59:59</latest>
+          <earliest>-48h@h</earliest>
+          <latest>@h</latest>
         </search>
         <option name="charting.chart">bar</option>
       </chart>
@@ -153,11 +153,11 @@
       <title>Events by host (forwarder health)</title>
       <table>
         <search>
-          <query>index=soc_capstone earliest="10/04/2026:00:00:00" latest="10/05/2026:23:59:59"
+          <query>index=soc_capstone earliest=-48h@h latest=@h
 | stats count, sparkline(count,1h) as trend by host, sourcetype
 | sort - count</query>
-          <earliest>10/04/2026:00:00:00</earliest>
-          <latest>10/05/2026:23:59:59</latest>
+          <earliest>-48h@h</earliest>
+          <latest>@h</latest>
         </search>
       </table>
     </panel>

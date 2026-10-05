@@ -6,10 +6,10 @@
   <!-- ===== Attk101 Brute Force ===== -->
   <row>
     <panel>
-      <title>Attk101 — SSH Brute Force (Linux auth.log) — top source IPs</title>
+      <title>Attk101 — SSH Brute Force by source IP (10/04–10/05)</title>
       <chart>
         <search>
-          <query>index=soc_capstone sourcetype=linux_secure "Failed password" earliest=-48h@h latest=@h
+          <query>index=soc_capstone sourcetype=linux_secure "Failed password" earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | rex field=_raw max_match=1 "from\s+(?&lt;src_ip&gt;\d+\.\d+\.\d+\.\d+)"
 | stats count by src_ip
 | sort - count
@@ -26,7 +26,7 @@
       <title>Ingestion over fixed window by sourcetype</title>
       <table>
         <search>
-          <query>index=soc_capstone earliest=-48h@h latest=@h
+          <query>index=soc_capstone earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | stats count by sourcetype
 | sort - count</query>
           <earliest>-48h@h</earliest>
@@ -42,7 +42,7 @@
       <title>Attk101 — SSH failed logins by source IP (Kali)</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=linux_secure "Failed password" earliest=-48h@h latest=@h
+          <query>index=soc_capstone sourcetype=linux_secure "Failed password" earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | rex field=_raw max_match=1 "from\s+(?&lt;src_ip&gt;\d+\.\d+\.\d+\.\d+)"
 | stats count by host, src_ip
 | sort - count
@@ -56,7 +56,7 @@
       <title>Windows — Sysmon network connections (EID 3)</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" earliest=-48h@h latest=@h
+          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | rex field=_raw max_match=1 "SourceIp.\&gt;(?&lt;src_ip&gt;[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"
 | rex field=_raw max_match=1 "DestinationIp.\&gt;(?&lt;dest_ip&gt;[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"
 | rex field=_raw max_match=1 "DestinationPort.\&gt;(?&lt;dest_port&gt;[0-9]+)"
@@ -73,10 +73,10 @@
   <!-- ===== Attk102 Account creation ===== -->
   <row>
     <panel>
-      <title>Attk102 — Local Account Creation (Security 4720) + Admin group adds</title>
+      <title>Attk102 — Local Account Creation + Admin group adds (10/04–10/05)</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=WinEventLog:Security (EventCode=4720 OR EventCode=4728 OR EventCode=4732) earliest=-48h@h latest=@h
+          <query>index=soc_capstone sourcetype=WinEventLog:Security (EventCode=4720 OR EventCode=4728 OR EventCode=4732) earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | eval action=case(EventCode=="4720","ACCOUNT_CREATED", EventCode=="4728","ADDED_TO_LOCALGROUP", EventCode=="4732","ADDED_TO_GLOBALGROUP")
 | eval actor=mvindex(Account_Name,0)
 | eval target=mvindex(Account_Name,1)
@@ -97,7 +97,7 @@
       <title>Attk103 — PowerShell download cradle (DownloadString)</title>
       <table>
         <search>
-          <query>index=soc_capstone DownloadString earliest=-48h@h latest=@h
+          <query>index=soc_capstone DownloadString earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | stats count by host, sourcetype
 | sort - count</query>
           <earliest>-48h@h</earliest>
@@ -106,10 +106,10 @@
       </table>
     </panel>
     <panel>
-<title>Attk103 — Sysmon EID 3 network connections (PowerShell)</title>
+<title>Attk103 — Sysmon EID 3 PowerShell network (0 detected)</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" powershell.exe earliest=-48h@h latest=@h
+          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" powershell.exe earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | rex field=_raw max_match=1 "SourceIp.\&gt;(?&lt;src_ip&gt;[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"
 | rex field=_raw max_match=1 "DestinationIp.\&gt;(?&lt;dest_ip&gt;[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"
 | rex field=_raw max_match=1 "DestinationPort.\&gt;(?&lt;dest_port&gt;[0-9]+)"
@@ -129,7 +129,7 @@
       <title>Attk104 — Security log cleared (EID 1102 / Sysmon 4)</title>
       <table>
         <search>
-          <query>index=soc_capstone ((sourcetype=WinEventLog:Security EventCode=1102) OR (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;4&lt;")) earliest=-48h@h latest=@h
+          <query>index=soc_capstone ((sourcetype=WinEventLog:Security EventCode=1102) OR (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;4&lt;")) earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | table _time host
 | sort - _time</query>
           <earliest>-48h@h</earliest>
@@ -145,7 +145,7 @@
       <title>Proof of ingestion — event count by sourcetype</title>
       <chart>
         <search>
-          <query>index=soc_capstone earliest=-48h@h latest=@h
+          <query>index=soc_capstone earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | stats count by sourcetype
 | sort - count</query>
           <earliest>-48h@h</earliest>
@@ -158,7 +158,7 @@
       <title>Events by host (forwarder health)</title>
       <table>
         <search>
-          <query>index=soc_capstone earliest=-48h@h latest=@h
+          <query>index=soc_capstone earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | stats count, sparkline(count,1h) as trend by host, sourcetype
 | sort - count</query>
           <earliest>-48h@h</earliest>

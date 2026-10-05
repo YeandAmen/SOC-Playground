@@ -16,9 +16,8 @@
 - Analyst → Mac : HTTP 8000 — Splunk Web UI
 - Analyst → Mac : HTTP 8765 — SignalScope live console (loopback)
 - Splunk mgmt API : 8089 (loopback only)
-- Mac → Kali : TCP 22 — SSH brute force (Attk101), observed in linux_secure logs
-- Mac → Windows : TCP 22 — SSH administration, observed in Sysmon EID 3
+- Mac → Kali : TCP 22 — SSH brute force (Attk101), observed in linux_secure logs (dashboard panel: SSH failed logins by source IP)
+- Mac → Windows : TCP 22 — SSH administration, observed in Sysmon EID 3 (dashboard panel: Sysmon EID 3 network connections)
 - Kali → Windows : TCP 22, 445 — SSH and SMB attempts, observed in Sysmon EID 3 and Security 4625
-- Windows → Mac : HTTP 8000 — PowerShell DownloadString payload fetch (Attk103), observed in Sysmon EID 1
 
-> Note: The topology is not fully isolated. Windows VMs make outbound connections to public IPs (observed in Sysmon EID 3 to ports 443/80). The lab telemetry (auth.log, Security, Sysmon) is forwarded only to the Splunk Manager via TCP 9997.
+> Endpoint telemetry is forwarded only to the Splunk Manager. The Windows endpoint also makes outbound 443/80 connections to public IPs (observed in Sysmon EID 3).

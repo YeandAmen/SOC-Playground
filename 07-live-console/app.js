@@ -240,3 +240,22 @@ $('trace').addEventListener('pointermove', updateTraceTooltip);
 $('trace').addEventListener('pointerleave', () => { hoverFraction = null; $('trace-tooltip').hidden = true; });
 refresh(); setInterval(refresh, 5000); requestAnimationFrame(animate);
 }
+
+async function loadTags() {
+  try {
+    const r = await fetch('/api/status', {cache:'no-store'});
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+    const c = data.tags || [];
+    const html = c.map(t => {
+      const dot = t.tag === 'red' ? '&#9679;' : '&#9675;';
+      const clr = t.tag === 'red' ? '#ff777c' : '#65e7d1';
+      return `<span style="color:${clr}">${dot}</span> <strong>${t.check}</strong> <span>${t.count} events</span>`;
+    }).join('<br>');
+    document.getElementById('status-tags').innerHTML = html || '<p class="empty">No data</p>';
+  } catch (_) {
+    document.getElementById('status-tags').innerHTML = '<p class="empty">offline</p>';
+  }
+}
+setInterval(loadTags, 30000);
+loadTags();

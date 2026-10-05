@@ -1,8 +1,0 @@
-=== DETECTION SEARCHES DEPLOYED ===
-[SOC - Attk101 SSH Brute Force (Linux)]
-[SOC - Attk101 Windows Brute Force (4625)]
-[SOC - Attk102 Local Account Created]
-[SOC - Attk102 Account Added to Administrators]
-[SOC - Attk103 PowerShell Download Cradle]
-[SOC - Attk103 Network Connect From PowerShell]
-[SOC - Attk104 Security Log Cleared]

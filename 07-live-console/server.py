@@ -220,6 +220,12 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         route = urllib.parse.urlparse(self.path)
+        if route.path == "/api/status":
+            try:
+                status = (ROOT.parent / "detection" / "status.json").read_text()
+                return self.send_json(json.loads(status))
+            except (FileNotFoundError, json.JSONDecodeError):
+                return self.send_json({"error": "no status.json — run detection/scan.py"}, 503)
         if route.path == "/api/health":
             if not SPLUNK_PASSWORD:
                 return self.send_json({"error": "Connect to Splunk first"}, 503)

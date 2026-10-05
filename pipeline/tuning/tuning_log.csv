@@ -1,5 +1,0 @@
-rule_id,date,problem,change,fp_before,fp_after,detection_preserved,sim_rerun_id,author
-RULE-ATTK101-001,2026-10-04,initial creation,first version,0,0,true,SIM-001,analyst
-RULE-ATTK102-001,2026-10-04,initial creation,first version,0,0,true,SIM-002,analyst
-RULE-ATTK103-001,2026-10-04,field exfiltrated — Sysmon XML fields not extracted,changed EventID=1 to DownloadString raw text match,0,0,true,SIM-003,analyst
-RULE-ATTK104-001,2026-10-04,initial creation,first version,0,0,true,SIM-004,analyst

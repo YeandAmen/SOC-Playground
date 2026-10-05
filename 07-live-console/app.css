@@ -209,3 +209,4 @@ tr:hover td { background: #1a2023; }
   .controls { gap: 8px; }
   .trace-tooltip { white-space: normal; }
 }
+.status-section{background:var(--panel);border:1px solid var(--rule);padding:18px 20px;margin:16px 0 24px;border-radius:4px}.status-section .section-head{display:flex;justify-content:space-between;margin:0 0 12px}.status-section h2{font-size:13px;margin:0;letter-spacing:1.2px;color:var(--amber)}.status-section span{color:var(--muted);font-size:11px}#status-tags{font-size:13px;line-height:1.7}

@@ -36,7 +36,7 @@
   <!-- ===== Attk101 IP Evidence ===== -->
   <row>
     <panel>
-      <title>SSH failed logins by source IP (10/04–10/05)</title>
+      <title>SSH failed logins by source IP [Attk101] (10/04–10/05)</title>
       <table>
         <search>
           <query>index=soc_capstone sourcetype=linux_secure "Failed password" earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
@@ -48,7 +48,7 @@
       </table>
     </panel>
     <panel>
-      <title>Sysmon EID 3 network connections (10/04–10/05)</title>
+      <title>Sysmon EID 3 network connections [Attk101] (10/04–10/05)</title>
       <table>
         <search>
           <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
@@ -66,7 +66,7 @@
   <!-- ===== Attk102 Account creation ===== -->
   <row>
     <panel>
-      <title>Account creation + admin group adds (10/04–10/05)</title>
+      <title>Account creation + admin group adds [Attk102] (10/04–10/05)</title>
       <table>
         <search>
           <query>index=soc_capstone sourcetype=WinEventLog:Security (EventCode=4720 OR EventCode=4728 OR EventCode=4732) earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
@@ -86,7 +86,7 @@
   <!-- ===== Attk103 PowerShell download ===== -->
   <row>
     <panel>
-      <title>PowerShell download cradle with URL evidence (10/04–10/05)</title>
+      <title>PowerShell download cradle [Attk103] (10/04–10/05)</title>
       <table>
         <search>
           <query>index=soc_capstone DownloadString earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
@@ -98,7 +98,7 @@
       </table>
     </panel>
     <panel>
-      <title>Sysmon EID 3 PowerShell network (0 detected)</title>
+      <title>Sysmon EID 3 PowerShell network [Attk103] (0 detected)</title>
       <table>
         <search>
           <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" powershell.exe earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
@@ -112,7 +112,7 @@
   <!-- ===== Attk104 Log clearing ===== -->
   <row>
     <panel>
-      <title>Security log cleared / Sysmon EID 4 (10/04–10/05)</title>
+      <title>Security log cleared [Attk104] (10/04–10/05)</title>
       <table>
         <search>
           <query>index=soc_capstone ((sourcetype=WinEventLog:Security EventCode=1102) OR (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;4&lt;")) earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"

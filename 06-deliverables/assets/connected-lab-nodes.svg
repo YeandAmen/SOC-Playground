@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1050" viewBox="0 0 1800 1050" role="img" aria-labelledby="title desc">
+  <title id="title">Connected SOC Lab Nodes</title>
+  <desc id="desc">Three computer nodes on an isolated UTM network: Splunk Manager, Windows Endpoint, and Kali Linux Endpoint.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#f8fbfc"/><stop offset="1" stop-color="#edf4f6"/></linearGradient>
+    <linearGradient id="dark" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#153941"/><stop offset="1" stop-color="#0a2028"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0a2028" flood-opacity="0.16"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#1d7f6e"/></marker>
+    <style>
+      .title{font:800 48px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#102027;letter-spacing:0}.sub{font:500 23px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#52646d;letter-spacing:0}.node{fill:white;stroke:#b9cbd2;stroke-width:2.5}.dark{fill:url(#dark);stroke:#0d3038;stroke-width:2.5}.label{font:800 30px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#102027;letter-spacing:0}.labelLight{font:800 30px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:white;letter-spacing:0}.mono{font:800 23px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#203740;letter-spacing:0}.monoLight{font:800 23px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#bdf5e6;letter-spacing:0}.small{font:500 21px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#43535b;letter-spacing:0}.smallLight{font:500 21px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#d9e7ea;letter-spacing:0}.flow{fill:none;stroke:#1d7f6e;stroke-width:7;marker-end:url(#arrow)}.flowText{font:800 20px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#1d6158;letter-spacing:0}.screen{fill:#eef5f7;stroke:#c6d6dd;stroke-width:2}.base{fill:#dce8ec}.boundary{fill:none;stroke:#9fb3bd;stroke-width:3;stroke-dasharray:14 12}
+    </style>
+  </defs>
+  <rect width="1800" height="1050" fill="url(#bg)"/>
+  <text x="90" y="90" class="title">Connected SOC Lab Nodes</text>
+  <text x="92" y="130" class="sub">Computer-node view of the isolated UTM security lab used for endpoint telemetry collection and attack validation.</text>
+  <rect x="80" y="185" width="1640" height="750" rx="34" class="boundary"/>
+  <text x="120" y="235" class="label">UTM Virtual Network</text>
+  <text x="120" y="272" class="mono">192.168.64.0/24</text>
+
+  <g transform="translate(690 300)" filter="url(#shadow)">
+    <rect x="0" y="0" width="420" height="265" rx="24" class="dark"/>
+    <rect x="70" y="68" width="280" height="126" rx="15" class="screen" opacity="0.16"/>
+    <rect x="110" y="210" width="200" height="34" rx="12" fill="#163d46"/>
+    <text x="50" y="52" class="labelLight">Splunk Manager</text>
+    <text x="50" y="92" class="monoLight">192.168.64.1</text>
+    <text x="50" y="136" class="smallLight">macOS host</text>
+    <text x="50" y="168" class="smallLight">Indexer / Search Head / Receiver</text>
+  </g>
+
+  <g transform="translate(170 350)" filter="url(#shadow)">
+    <rect x="0" y="0" width="370" height="245" rx="24" class="node"/>
+    <rect x="70" y="58" width="230" height="104" rx="14" class="screen"/>
+    <rect x="105" y="178" width="160" height="30" rx="10" class="base"/>
+    <text x="42" y="52" class="label">Windows Endpoint</text>
+    <text x="42" y="92" class="mono">192.168.64.2</text>
+    <text x="42" y="135" class="small">Sysmon + Universal Forwarder</text>
+    <text x="42" y="168" class="small">Security/System/Application logs</text>
+  </g>
+
+  <g transform="translate(1260 350)" filter="url(#shadow)">
+    <rect x="0" y="0" width="370" height="245" rx="24" class="node"/>
+    <rect x="70" y="58" width="230" height="104" rx="14" class="screen"/>
+    <rect x="105" y="178" width="160" height="30" rx="10" class="base"/>
+    <text x="42" y="52" class="label">Kali Linux Endpoint</text>
+    <text x="42" y="92" class="mono">192.168.64.4</text>
+    <text x="42" y="135" class="small">OpenSSH + Universal Forwarder</text>
+    <text x="42" y="168" class="small">auth.log/syslog telemetry</text>
+  </g>
+
+  <path d="M540 475 C615 455 640 455 690 455" class="flow"/>
+  <text x="545" y="420" class="flowText">Windows UF telemetry</text>
+  <text x="592" y="450" class="flowText">TCP 9997</text>
+  <path d="M1260 475 C1190 455 1165 455 1110 455" class="flow"/>
+  <text x="1130" y="420" class="flowText">Kali UF telemetry</text>
+  <text x="1175" y="450" class="flowText">TCP 9997</text>
+  <path d="M900 565 L900 740" class="flow"/>
+  <g transform="translate(655 740)" filter="url(#shadow)">
+    <rect width="490" height="115" rx="22" class="node"/>
+    <text x="42" y="45" class="label">SOC Analyst Console</text>
+    <text x="42" y="82" class="small">Splunk Web + SignalScope live trace</text>
+  </g>
+</svg>

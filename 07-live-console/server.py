@@ -28,7 +28,6 @@ HOST = os.environ.get("CONSOLE_HOST", "127.0.0.1")
 TLS_VERIFY = os.environ.get("SPLUNK_TLS_VERIFY", "0") == "1"
 
 SEARCHES = {
-    "normal": '(sourcetype=linux_secure "Accepted password") OR (sourcetype=WinEventLog:System) OR (sourcetype=WinEventLog:Application)',
     "ssh": 'sourcetype=linux_secure ("Failed password" OR "Accepted password")',
     "account": 'sourcetype=WinEventLog:Security (EventCode=4720 OR EventCode=4732 OR EventCode=1102)',
     "powershell": 'sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational (DownloadString OR DownloadFile OR Invoke-WebRequest OR Net.WebClient OR EncodedCommand)',
@@ -88,10 +87,6 @@ def parse_time(value):
 def classify(kind, row):
     raw = row.get("_raw", "") or ""
     code = str(row.get("EventCode") or row.get("EventID") or "")
-    if kind == "normal":
-        # Baseline event — count it for the waveform but don't tag as detection
-        label = "system" if "System" in (row.get("sourcetype") or "") else "auth_ok"
-        return (label, "baseline", "info", row.get("host") or "unknown")
     if kind == "ssh":
         failed = "Failed password" in raw
         match = re.search(r"from ([0-9a-fA-F:.]+)", raw)
@@ -126,7 +121,6 @@ def classify(kind, row):
 
 def build_snapshot(rows_by_kind, hours):
     events = []
-    baseline_events = []
     unparsed_time = 0
     for kind, rows in rows_by_kind.items():
         for row in rows:
@@ -138,7 +132,7 @@ def build_snapshot(rows_by_kind, hours):
             if not timestamp:
                 unparsed_time += 1
                 continue
-            entry = {
+            events.append({
                 "time": timestamp,
                 "host": row.get("host") or "unknown",
                 "label": label,
@@ -146,27 +140,15 @@ def build_snapshot(rows_by_kind, hours):
                 "severity": severity,
                 "actor": actor,
                 "detail": (row.get("CommandLine") or row.get("_raw") or "")[:340],
-            }
-            if technique == "baseline":
-                baseline_events.append(entry)
-            else:
-                events.append(entry)
+            })
     events.sort(key=lambda event: event["time"], reverse=True)
-    baseline_events.sort(key=lambda event: event["time"], reverse=True)
     now = time.time()
     window_start = now - hours * 3600
-    # Baseline bins (gentle wave of normal activity)
-    base_bins = [0] * 60
-    for event in baseline_events:
-        index = int((event["time"] - window_start) / (hours * 3600) * 60)
-        if 0 <= index < 60:
-            base_bins[index] += 1
-    # Attack bins (colored spikes)
-    attack_bins = [Counter() for _ in range(60)]
+    bins = [Counter() for _ in range(60)]
     for event in events:
         index = int((event["time"] - window_start) / (hours * 3600) * 60)
         if 0 <= index < 60:
-            attack_bins[index][event["technique"]] += 1
+            bins[index][event["technique"]] += 1
     ssh_failures = [event for event in events if event["label"] == "SSH failure"]
     burst = any(sum(1 for other in ssh_failures if 0 <= event["time"] - other["time"] <= 300 and event["actor"] == other["actor"]) >= 10 for event in ssh_failures)
     detections = []
@@ -180,14 +162,11 @@ def build_snapshot(rows_by_kind, hours):
         "updated_at": now,
         "hours": hours,
         "events": events[:100],
-        "baseline_events": baseline_events[:100],
-        "trace_events": [{"time": event["time"], "technique": event["technique"]} for event in events] + [{"time": event["time"], "technique": "baseline"} for event in baseline_events],
-        "trace": [dict(item) for item in attack_bins],
-        "baseline_trace": base_bins,
+        "trace_events": [{"time": event["time"], "technique": event["technique"]} for event in events],
+        "trace": [dict(item) for item in bins],
         "detections": detections,
         "counts": dict(Counter(event["technique"] for event in events)),
-        "baseline_total": sum(base_bins),
-        "hosts": sorted({event["host"] for event in events + baseline_events}),
+        "hosts": sorted({event["host"] for event in events}),
         "total": len(events),
         "limited": any(len(rows) == MAX_PER_SEARCH for rows in rows_by_kind.values()),
         "source_rows": {kind: len(rows) for kind, rows in rows_by_kind.items()},

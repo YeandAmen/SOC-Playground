@@ -1,13 +1,13 @@
 {
-  "scanned_at": "2026-10-05T03:59:10Z",
+  "scanned_at": "2026-10-05T04:00:43Z",
   "risk": "elevated",
   "summary": "6 red / 1 blue",
   "checks": [
     {
       "check": "SSH brute force",
       "tag": "red",
-      "count": 116,
-      "last_event": "2026-10-05T04:59:18",
+      "count": 122,
+      "last_event": "2026-10-05T04:59:42",
       "threshold": 10
     },
     {

@@ -1,62 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1050" viewBox="0 0 1800 1050" role="img" aria-labelledby="title desc">
-  <title id="title">Connected SOC Lab Nodes</title>
-  <desc id="desc">Three computer nodes on an isolated UTM network: Splunk Manager, Windows Endpoint, and Kali Linux Endpoint.</desc>
+  <title id="title">Computer Node Topology</title>
+  <desc id="desc">Literal computer icons connected to a central switch: Splunk Manager, Windows endpoint, Kali endpoint, analyst console, and printer-style evidence output.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#f8fbfc"/><stop offset="1" stop-color="#edf4f6"/></linearGradient>
-    <linearGradient id="dark" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#153941"/><stop offset="1" stop-color="#0a2028"/></linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0a2028" flood-opacity="0.16"/></filter>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#1d7f6e"/></marker>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#fbfcfd"/><stop offset="1" stop-color="#edf3f6"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#263238" flood-opacity="0.18"/></filter>
     <style>
-      .title{font:800 48px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#102027;letter-spacing:0}.sub{font:500 23px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#52646d;letter-spacing:0}.node{fill:white;stroke:#b9cbd2;stroke-width:2.5}.dark{fill:url(#dark);stroke:#0d3038;stroke-width:2.5}.label{font:800 30px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#102027;letter-spacing:0}.labelLight{font:800 30px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:white;letter-spacing:0}.mono{font:800 23px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#203740;letter-spacing:0}.monoLight{font:800 23px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#bdf5e6;letter-spacing:0}.small{font:500 21px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#43535b;letter-spacing:0}.smallLight{font:500 21px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#d9e7ea;letter-spacing:0}.flow{fill:none;stroke:#1d7f6e;stroke-width:7;marker-end:url(#arrow)}.flowText{font:800 20px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#1d6158;letter-spacing:0}.screen{fill:#eef5f7;stroke:#c6d6dd;stroke-width:2}.base{fill:#dce8ec}.boundary{fill:none;stroke:#9fb3bd;stroke-width:3;stroke-dasharray:14 12}
+      .title{font:800 48px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#102027}.sub{font:500 23px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#52646d}.label{font:800 24px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#102027}.mono{font:800 21px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#263b44}.small{font:600 18px ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#4f6068}.line{stroke:#768b94;stroke-width:4;fill:none}.tele{stroke:#1d7f6e;stroke-width:5;fill:none}.attack{stroke:#b84b4b;stroke-width:4;stroke-dasharray:12 9;fill:none}.screen{fill:#eef5f7;stroke:#758991;stroke-width:4}.case{fill:#f7fafb;stroke:#758991;stroke-width:4}.dark{fill:#183640}.accent{fill:#52c7b8}.stand{fill:#d8e4e8;stroke:#758991;stroke-width:4}.switch{fill:#f4f7f8;stroke:#697f88;stroke-width:4}.port{fill:#1d7f6e}.boundary{fill:none;stroke:#a7bac2;stroke-width:3;stroke-dasharray:14 12}.chip{fill:#e8f0f3;stroke:#b9cbd2;stroke-width:2}.chipText{font:800 16px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#30444c}
     </style>
   </defs>
   <rect width="1800" height="1050" fill="url(#bg)"/>
-  <text x="90" y="90" class="title">Connected SOC Lab Nodes</text>
-  <text x="92" y="130" class="sub">Computer-node view of the isolated UTM security lab used for endpoint telemetry collection and attack validation.</text>
-  <rect x="80" y="185" width="1640" height="750" rx="34" class="boundary"/>
-  <text x="120" y="235" class="label">UTM Virtual Network</text>
-  <text x="120" y="272" class="mono">192.168.64.0/24</text>
+  <text x="88" y="90" class="title">Computer Node Topology</text>
+  <text x="90" y="128" class="sub">Literal endpoint and manager computers connected through the isolated UTM lab network.</text>
+  <rect x="75" y="178" width="1650" height="780" rx="30" class="boundary"/>
+  <text x="112" y="228" class="label">UTM Virtual Network</text>
+  <text x="112" y="262" class="mono">192.168.64.0/24</text>
 
-  <g transform="translate(690 300)" filter="url(#shadow)">
-    <rect x="0" y="0" width="420" height="265" rx="24" class="dark"/>
-    <rect x="70" y="68" width="280" height="126" rx="15" class="screen" opacity="0.16"/>
-    <rect x="110" y="210" width="200" height="34" rx="12" fill="#163d46"/>
-    <text x="50" y="52" class="labelLight">Splunk Manager</text>
-    <text x="50" y="92" class="monoLight">192.168.64.1</text>
-    <text x="50" y="136" class="smallLight">macOS host</text>
-    <text x="50" y="168" class="smallLight">Indexer / Search Head / Receiver</text>
+  <g id="switch" transform="translate(805 465)" filter="url(#shadow)">
+    <rect x="0" y="0" width="190" height="90" rx="18" class="switch"/>
+    <rect x="30" y="30" width="22" height="14" rx="3" class="port"/><rect x="64" y="30" width="22" height="14" rx="3" class="port"/><rect x="98" y="30" width="22" height="14" rx="3" class="port"/><rect x="132" y="30" width="22" height="14" rx="3" class="port"/>
+    <text x="40" y="72" class="chipText">LAB SWITCH</text>
   </g>
 
-  <g transform="translate(170 350)" filter="url(#shadow)">
-    <rect x="0" y="0" width="370" height="245" rx="24" class="node"/>
-    <rect x="70" y="58" width="230" height="104" rx="14" class="screen"/>
-    <rect x="105" y="178" width="160" height="30" rx="10" class="base"/>
-    <text x="42" y="52" class="label">Windows Endpoint</text>
-    <text x="42" y="92" class="mono">192.168.64.2</text>
-    <text x="42" y="135" class="small">Sysmon + Universal Forwarder</text>
-    <text x="42" y="168" class="small">Security/System/Application logs</text>
+  <path d="M805 508 L510 330" class="tele"/><path d="M995 508 L1290 330" class="tele"/><path d="M900 465 L900 295" class="tele"/><path d="M850 555 L585 755" class="line"/><path d="M950 555 L1215 755" class="attack"/>
+
+  <g transform="translate(695 210)" filter="url(#shadow)">
+    <rect x="0" y="0" width="410" height="55" rx="12" class="chip"/><text x="34" y="36" class="label">Splunk Manager</text><text x="245" y="36" class="mono">192.168.64.1</text>
+    <rect x="105" y="75" width="185" height="210" rx="12" fill="#f1efe5" stroke="#857d69" stroke-width="4"/>
+    <rect x="130" y="105" width="135" height="18" rx="4" fill="#d1c9ac"/><circle cx="152" cy="245" r="12" fill="#52c7b8"/><rect x="185" y="236" width="70" height="18" rx="4" fill="#c4baa0"/>
+    <text x="108" y="324" class="small">macOS host - Splunk Enterprise</text>
+    <text x="108" y="351" class="small">8000 Web / 9997 Receiver / 8765 Console</text>
   </g>
 
-  <g transform="translate(1260 350)" filter="url(#shadow)">
-    <rect x="0" y="0" width="370" height="245" rx="24" class="node"/>
-    <rect x="70" y="58" width="230" height="104" rx="14" class="screen"/>
-    <rect x="105" y="178" width="160" height="30" rx="10" class="base"/>
-    <text x="42" y="52" class="label">Kali Linux Endpoint</text>
-    <text x="42" y="92" class="mono">192.168.64.4</text>
-    <text x="42" y="135" class="small">OpenSSH + Universal Forwarder</text>
-    <text x="42" y="168" class="small">auth.log/syslog telemetry</text>
+  <g transform="translate(230 250)" filter="url(#shadow)">
+    <rect x="0" y="0" width="335" height="55" rx="12" class="chip"/><text x="24" y="36" class="label">Windows Endpoint</text>
+    <rect x="78" y="84" width="170" height="130" rx="10" class="screen"/><rect x="104" y="109" width="118" height="72" rx="6" fill="#cbdde3"/><rect x="140" y="214" width="45" height="45" class="stand"/><rect x="95" y="258" width="135" height="25" rx="8" class="stand"/>
+    <text x="65" y="324" class="mono">192.168.64.2</text><text x="65" y="354" class="small">Sysmon + Splunk UF</text>
   </g>
 
-  <path d="M540 475 C615 455 640 455 690 455" class="flow"/>
-  <text x="545" y="420" class="flowText">Windows UF telemetry</text>
-  <text x="592" y="450" class="flowText">TCP 9997</text>
-  <path d="M1260 475 C1190 455 1165 455 1110 455" class="flow"/>
-  <text x="1130" y="420" class="flowText">Kali UF telemetry</text>
-  <text x="1175" y="450" class="flowText">TCP 9997</text>
-  <path d="M900 565 L900 740" class="flow"/>
-  <g transform="translate(655 740)" filter="url(#shadow)">
-    <rect width="490" height="115" rx="22" class="node"/>
-    <text x="42" y="45" class="label">SOC Analyst Console</text>
-    <text x="42" y="82" class="small">Splunk Web + SignalScope live trace</text>
+  <g transform="translate(1240 250)" filter="url(#shadow)">
+    <rect x="0" y="0" width="320" height="55" rx="12" class="chip"/><text x="24" y="36" class="label">Kali Endpoint</text>
+    <path d="M82 205 L132 85 L277 140 L222 258 Z" class="case"/><path d="M132 85 L277 140 L222 258 L82 205 Z" fill="#eef5f7" stroke="#758991" stroke-width="4"/><rect x="120" y="112" width="115" height="75" rx="6" fill="#cbdde3"/><path d="M82 205 L222 258 L190 286 L50 230 Z" class="stand"/>
+    <text x="58" y="324" class="mono">192.168.64.4</text><text x="58" y="354" class="small">OpenSSH + Splunk UF</text>
   </g>
+
+  <g transform="translate(360 700)" filter="url(#shadow)">
+    <rect x="0" y="0" width="420" height="55" rx="12" class="chip"/><text x="24" y="36" class="label">SOC Analyst Console</text>
+    <rect x="100" y="82" width="190" height="135" rx="10" class="screen"/><rect x="128" y="108" width="135" height="75" rx="6" fill="#cbdde3"/><rect x="138" y="218" width="115" height="25" rx="8" class="stand"/>
+    <text x="70" y="285" class="small">Splunk Web + SignalScope</text><text x="70" y="315" class="mono">127.0.0.1:8765</text>
+  </g>
+
+  <g transform="translate(1095 705)" filter="url(#shadow)">
+    <rect x="0" y="0" width="360" height="55" rx="12" class="chip"/><text x="24" y="36" class="label">Evidence Output</text>
+    <rect x="100" y="95" width="150" height="105" rx="12" class="case"/><rect x="120" y="67" width="110" height="65" rx="7" fill="#f8fafb" stroke="#758991" stroke-width="4"/><rect x="125" y="125" width="100" height="16" rx="4" fill="#52c7b8"/><rect x="115" y="165" width="120" height="52" rx="8" fill="#d8e4e8" stroke="#758991" stroke-width="4"/>
+    <text x="72" y="280" class="small">PDF report diagrams</text><text x="72" y="310" class="mono">06-deliverables</text>
+  </g>
+
+  <text x="520" y="355" class="small">WinEventLog + Sysmon -> TCP 9997</text>
+  <text x="995" y="355" class="small">auth.log + syslog -> TCP 9997</text>
+  <text x="970" y="690" class="small" fill="#9b3c3c">attack simulations + evidence</text>
 </svg>

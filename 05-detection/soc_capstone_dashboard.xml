@@ -13,6 +13,7 @@
 | rex field=_raw max_match=1 "from\s+(?&lt;src_ip&gt;\d+\.\d+\.\d+\.\d+)"
 | stats count by src_ip | sort - count | head 10</query>
           <earliest>-48h@h</earliest><latest>@h</latest>
+          <option name="count">50</option>
         </search>
         <option name="charting.chart">column</option>
         <option name="charting.axisTitleX.text">Source IP</option>
@@ -26,6 +27,7 @@
           <query>index=soc_capstone earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | stats count by sourcetype | sort - count</query>
           <earliest>-48h@h</earliest><latest>@h</latest>
+          <option name="count">50</option>
         </search>
       </table>
     </panel>
@@ -41,6 +43,7 @@
 | rex field=_raw max_match=1 "from\s+(?&lt;src_ip&gt;\d+\.\d+\.\d+\.\d+)"
 | stats count by host, src_ip | sort - count | head 20</query>
           <earliest>-48h@h</earliest><latest>@h</latest>
+          <option name="count">50</option>
         </search>
       </table>
     </panel>
@@ -54,6 +57,7 @@
 | rex field=_raw max_match=1 "DestinationPort.\&gt;(?&lt;dest_port&gt;[0-9]+)"
 | stats count by host, src_ip, dest_ip, dest_port | sort - count | head 20</query>
           <earliest>-48h@h</earliest><latest>@h</latest>
+          <option name="count">50</option>
         </search>
       </table>
     </panel>
@@ -87,7 +91,8 @@
         <search>
           <query>index=soc_capstone DownloadString earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | rex field=_raw max_match=1 "(?&lt;target_url&gt;http://192\.168\.64\.1[^\s\"\)]+)"
-| table _time, host, target_url | sort - _time</query>
+| rex field=_raw max_match=1 "(?&lt;filename&gt;soc_benign_payload\.\w+)"
+| table _time, host, filename, target_url | sort - _time</query>
           <earliest>-48h@h</earliest><latest>@h</latest>
         </search>
       </table>
@@ -127,6 +132,7 @@
           <query>index=soc_capstone earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | stats count by sourcetype | sort - count</query>
           <earliest>-48h@h</earliest><latest>@h</latest>
+          <option name="count">50</option>
         </search>
         <option name="charting.chart">bar</option>
       </chart>
@@ -138,6 +144,7 @@
           <query>index=soc_capstone earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
 | stats count, sparkline(count,1h) as trend by host, sourcetype | sort - count</query>
           <earliest>-48h@h</earliest><latest>@h</latest>
+          <option name="count">50</option>
         </search>
       </table>
     </panel>

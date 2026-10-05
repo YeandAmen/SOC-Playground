@@ -18,7 +18,7 @@
 - Splunk mgmt API : 8089 (loopback only)
 - Mac → Kali : TCP 22 — SSH brute force (Attk101), observed in linux_secure logs (dashboard panel: SSH failed logins by source IP)
 - Mac → Windows : TCP 22 — SSH administration, observed in Sysmon EID 3 (dashboard panel: Sysmon EID 3 network connections)
-- Kali → Windows : TCP 22, 445, 3389 — SSH, SMB and RDP attempts, observed in Sysmon EID 3, Security 4625 and RDP log
+- Kali → Windows : TCP 22, 445 — SSH, SMB and RDP attempts, observed in Sysmon EID 3, Security 4625
 - Windows VM also has a 10.2.0.2 interface (ProtonVPN tunnel), observed in Sysmon EID 3 (48 events)
 
 > Endpoint telemetry is forwarded only to the Splunk Manager. The Windows endpoint also makes outbound 443/80 connections to public IPs (observed in Sysmon EID 3).

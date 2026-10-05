@@ -1,73 +1,56 @@
 {
-  "timestamp": "2026-10-05T03:39:36Z",
-  "summary": "6 red / 1 blue",
-  "tags": [
+  "scanned_at": "2026-10-05T03:43:53Z",
+  "risk": "elevated",
+  "summary": "5 red / 2 blue",
+  "checks": [
     {
       "check": "SSH brute force",
-      "tag": "red",
-      "count": 1,
-      "raw": [
-        "host total threshold",
-        "---- ----- ---------",
-        "kali    94         1"
-      ]
+      "tag": "blue",
+      "count": 0,
+      "last_event": "-",
+      "threshold": 10
     },
     {
       "check": "Windows 4625",
       "tag": "red",
-      "count": 1,
-      "raw": [
-        " ComputerName   total threshold",
-        "--------------- ----- ---------",
-        "WIN-JCNJR9HDAMK    19         1"
-      ]
+      "count": 19,
+      "last_event": "-",
+      "threshold": 5
     },
     {
       "check": "Account created",
       "tag": "red",
       "count": 8,
-      "raw": [
-        "     host       total",
-        "--------------- -----",
-        "WIN-JCNJR9HDAMK     8"
-      ]
+      "last_event": "2026-10-04T15:37:54",
+      "threshold": 1
     },
     {
       "check": "Admin group add",
       "tag": "red",
       "count": 52,
-      "raw": [
-        "     host       total",
-        "--------------- -----",
-        "WIN-JCNJR9HDAMK    52"
-      ]
+      "last_event": "2026-10-04T15:37:55",
+      "threshold": 1
     },
     {
       "check": "PS download cradle",
       "tag": "red",
       "count": 12,
-      "raw": [
-        "     host       total",
-        "--------------- -----",
-        "WIN-JCNJR9HDAMK    12"
-      ]
+      "last_event": "2026-10-04T14:43:26",
+      "threshold": 1
     },
     {
       "check": "PS network",
       "tag": "red",
       "count": 258,
-      "raw": [
-        "     host       total",
-        "--------------- -----",
-        "WIN-JCNJR9HDAMK   258"
-      ]
+      "last_event": "2026-10-04T15:41:34",
+      "threshold": 1
     },
     {
       "check": "Log cleared",
       "tag": "blue",
       "count": 0,
-      "raw": []
+      "last_event": "-",
+      "threshold": 1
     }
-  ],
-  "risk": "elevated"
+  ]
 }

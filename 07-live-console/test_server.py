@@ -55,7 +55,25 @@ class SnapshotTests(unittest.TestCase):
         result = server.build_snapshot(rows, 1)
         self.assertEqual(result["total"], 0)
         self.assertEqual(len(result["trace_baseline_events"]), 1)
+        self.assertEqual(result["observed_total"], 1)
+        self.assertEqual(result["hosts"], ["kali"])
         self.assertEqual(result["detections"], [])
+
+    def test_low_risk_system_events_are_baseline(self):
+        now = time.time()
+        rows = {
+            "normal": [
+                {"event_epoch": now, "host": "kali", "sourcetype": "syslog", "_raw": "cron hourly job"},
+                {"event_epoch": now - 3, "host": "WIN-LAB", "sourcetype": "WinEventLog:System", "_raw": "service control manager"},
+                {"event_epoch": now - 6, "host": "WIN-LAB", "sourcetype": "WinEventLog:Application", "_raw": "application information"},
+            ]
+        }
+        result = server.build_snapshot(rows, 1)
+        self.assertEqual(result["total"], 0)
+        self.assertEqual(result["baseline_total"], 3)
+        self.assertEqual(result["observed_total"], 3)
+        self.assertEqual(result["hosts"], ["WIN-LAB", "kali"])
+        self.assertTrue(any(result["baseline_trace"]))
 
     def test_security_log_clear_is_critical(self):
         stamp = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()

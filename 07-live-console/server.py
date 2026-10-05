@@ -28,8 +28,8 @@ HOST = os.environ.get("CONSOLE_HOST", "127.0.0.1")
 TLS_VERIFY = os.environ.get("SPLUNK_TLS_VERIFY", "0") == "1"
 
 SEARCHES = {
-    "normal": '(sourcetype=linux_secure "Accepted password") OR (sourcetype=WinEventLog:System "EventID>1<")',
-    "ssh": 'sourcetype=linux_secure ("Failed password" OR "Accepted password")',
+    "normal": '(sourcetype=syslog) OR (sourcetype=linux_secure ("Accepted password" OR "session opened" OR "session closed" OR sudo OR CRON)) OR (sourcetype=WinEventLog:System) OR (sourcetype=WinEventLog:Application)',
+    "ssh": 'sourcetype=linux_secure "Failed password"',
     "account": 'sourcetype=WinEventLog:Security (EventCode=4720 OR EventCode=4732 OR EventCode=1102)',
     "powershell": 'sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational (DownloadString OR DownloadFile OR Invoke-WebRequest OR Net.WebClient OR EncodedCommand)',
 }
@@ -89,7 +89,17 @@ def classify(kind, row):
     raw = row.get("_raw", "") or ""
     code = str(row.get("EventCode") or row.get("EventID") or "")
     if kind == "normal":
-        return ("baseline", "baseline", "info", row.get("host") or "unknown")
+        sourcetype = row.get("sourcetype") or ""
+        if "Accepted password" in raw:
+            match = re.search(r"from ([0-9a-fA-F:.]+)", raw)
+            return ("SSH success", "baseline", "info", match.group(1) if match else "trusted login")
+        if sourcetype == "linux_secure":
+            return ("Linux auth/session activity", "baseline", "info", row.get("host") or "linux")
+        if sourcetype == "syslog":
+            return ("Linux system activity", "baseline", "info", row.get("host") or "linux")
+        if sourcetype == "WinEventLog:Application":
+            return ("Windows application activity", "baseline", "info", row.get("host") or "windows")
+        return ("Windows system activity", "baseline", "info", row.get("host") or "windows")
     if kind == "ssh":
         failed = "Failed password" in raw
         match = re.search(r"from ([0-9a-fA-F:.]+)", raw)
@@ -207,7 +217,9 @@ def build_snapshot(rows_by_kind, hours):
         "baseline_profile": build_series(baseline_events, now, hours * 3600),
         "detections": detections,
         "counts": dict(Counter(event["technique"] for event in events)),
-        "hosts": sorted({event["host"] for event in events}),
+        "baseline_total": len(baseline_events),
+        "observed_total": len(events) + len(baseline_events),
+        "hosts": sorted({event["host"] for event in events + baseline_events}),
         "total": len(events),
         "limited": any(len(rows) == MAX_PER_SEARCH for rows in rows_by_kind.values()),
         "source_rows": {kind: len(rows) for kind, rows in rows_by_kind.items()},

@@ -195,14 +195,20 @@ function updateTraceTooltip(event) {
 
 function render(data) {
   current = data;
-  $('total-count').textContent = data.total.toLocaleString();
-  $('metric-events').textContent = data.total.toLocaleString();
+  const observedTotal = data.observed_total ?? data.total;
+  const baselineTotal = data.baseline_total ?? 0;
+  $('total-count').textContent = observedTotal.toLocaleString();
+  $('metric-events').textContent = observedTotal.toLocaleString();
   $('metric-detections').textContent = data.detections.length;
   $('metric-hosts').textContent = data.hosts.length;
   $('last-update').textContent = `LAST SEARCH ${new Date(data.updated_at * 1000).toLocaleString()} / POLL 5s`;
-  $('event-count').textContent = `${data.events.length} SHOWN`;
+  $('event-count').textContent = `${data.events.length} ANOMALY SHOWN`;
   const sampled = !data.trace_events && data.total > data.events.length;
-  $('limit-note').textContent = sampled ? `Live capture is limited to the newest ${data.events.length} of ${data.total} matching events.` : data.limited ? 'Result limit reached. Narrow the search window to inspect more events.' : '';
+  $('limit-note').textContent = sampled
+    ? `Live capture is limited to the newest ${data.events.length} of ${data.total} anomaly events.`
+    : data.limited
+      ? `Result limit reached. Showing ${data.total} anomalies and ${baselineTotal} baseline events from the selected window.`
+      : `${data.total} anomaly event(s), ${baselineTotal} baseline event(s).`;
   const stats = $('technique-stats'); stats.replaceChildren();
   const maximum = Math.max(1, ...Object.values(data.counts));
   for (const [technique, color] of Object.entries(colors)) {

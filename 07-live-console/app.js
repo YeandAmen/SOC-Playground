@@ -1,5 +1,5 @@
 const TraceModel = (() => {
-  const techniques = ['Attk101', 'Attk102', 'Attk103', 'Attk104'];
+  const techniques = ['baseline', 'Attk101', 'Attk102', 'Attk103', 'Attk104'];
   function buildProfiles(observations, end, seconds, samples = 480) {
     const profiles = Object.fromEntries(techniques.map(key => [key, Array(samples).fill(0)]));
     const spacing = seconds / (samples - 1), sigma = Math.max(1.5, spacing * 0.65), start = end - seconds;

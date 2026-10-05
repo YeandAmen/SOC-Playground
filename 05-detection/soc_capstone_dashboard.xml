@@ -81,7 +81,8 @@
 | eval actor=mvindex(Account_Name,0)
 | eval target=mvindex(Account_Name,1)
 | eval target=if(target=="-" OR isnull(target),"N/A",target)
-| table _time, host, action, actor, target
+| rex field=_raw max_match=1 "Group Name:\s+(?&lt;group_name&gt;[^\r\n]+)"
+| table _time, host, action, actor, target, group_name
 | sort - _time</query>
           <earliest>-48h@h</earliest>
           <latest>@h</latest>
@@ -105,12 +106,16 @@
       </table>
     </panel>
     <panel>
-      <title>Attk103 — Sysmon EID 3 network connections</title>
+<title>Attk103 — Sysmon EID 3 network connections (PowerShell)</title>
       <table>
         <search>
-          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" earliest=-48h@h latest=@h
-| stats count by host
-| sort - count</query>
+          <query>index=soc_capstone sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational "EventID&gt;3&lt;" powershell.exe earliest=-48h@h latest=@h
+| rex field=_raw max_match=1 "SourceIp.\&gt;(?&lt;src_ip&gt;[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"
+| rex field=_raw max_match=1 "DestinationIp.\&gt;(?&lt;dest_ip&gt;[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"
+| rex field=_raw max_match=1 "DestinationPort.\&gt;(?&lt;dest_port&gt;[0-9]+)"
+| stats count by host, src_ip, dest_ip, dest_port
+| sort - count
+| head 20</query>
           <earliest>-48h@h</earliest>
           <latest>@h</latest>
         </search>

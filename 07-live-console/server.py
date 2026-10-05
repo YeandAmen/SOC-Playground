@@ -93,7 +93,10 @@ def classify(kind, row):
     if kind == "ssh":
         failed = "Failed password" in raw
         match = re.search(r"from ([0-9a-fA-F:.]+)", raw)
-        return ("SSH failure" if failed else "SSH success", "Attk101", "high" if failed else "medium", match.group(1) if match else (row.get("src") or "unknown"))
+        actor = match.group(1) if match else (row.get("src") or "unknown")
+        if not failed:
+            return ("SSH success", "baseline", "info", actor)
+        return ("SSH failure", "Attk101", "high", actor)
     if kind == "account":
         if code == "4732" and "Administrators" not in raw and "S-1-5-32-544" not in raw:
             return None
@@ -120,6 +123,22 @@ def classify(kind, row):
     row["CommandLine"] = command
     label = "PowerShell download command" if any(marker in command.lower() for marker in cradle) else "PowerShell lab payload script"
     return (label, "Attk103", "high", fields.get("User") or row.get("User") or "")
+
+
+def build_series(observations, end, seconds, samples=480):
+    values = [0] * samples
+    if samples < 2:
+        return values
+    spacing = seconds / (samples - 1)
+    sigma = max(1.5, spacing * 0.65)
+    start = end - seconds
+    for event in observations:
+        position = (event["time"] - start) / spacing
+        radius = sigma * 3 / spacing
+        for index in range(max(0, int(position - radius)), min(samples - 1, int(position + radius) + 1) + 1):
+            distance = (index - position) * spacing / sigma
+            values[index] += 2.718281828 ** (-0.5 * distance * distance)
+    return values
 
 
 def build_snapshot(rows_by_kind, hours):
@@ -164,10 +183,15 @@ def build_snapshot(rows_by_kind, hours):
         if 0 <= index < 60:
             bins[index][event["technique"]] += 1
     ssh_failures = [event for event in events if event["label"] == "SSH failure"]
-    burst = any(sum(1 for other in ssh_failures if 0 <= event["time"] - other["time"] <= 300 and event["actor"] == other["actor"]) >= 10 for event in ssh_failures)
+    burst_source = None
+    burst_count = 0
+    for event in ssh_failures:
+        count = sum(1 for other in ssh_failures if 0 <= event["time"] - other["time"] <= 300 and event["actor"] == other["actor"])
+        if count >= 10 and count > burst_count:
+            burst_source, burst_count = event["actor"], count
     detections = []
-    if burst:
-        detections.append({"title": "SSH failure burst", "technique": "Attk101", "severity": "high", "reason": "10+ failures from one source within five minutes"})
+    if burst_source:
+        detections.append({"title": "SSH failure burst", "technique": "Attk101", "severity": "high", "reason": f"{burst_count} failures from {burst_source} within five minutes"})
     for technique, title in (("Attk102", "Account change"), ("Attk103", "PowerShell download"), ("Attk104", "Security log cleared")):
         matching = [event for event in events if event["technique"] == technique]
         if matching:
@@ -177,8 +201,10 @@ def build_snapshot(rows_by_kind, hours):
         "hours": hours,
         "events": events[:100],
         "trace_events": events,
+        "trace_baseline_events": baseline_events,
         "trace": [dict(item) for item in bins],
         "baseline_trace": base_bins,
+        "baseline_profile": build_series(baseline_events, now, hours * 3600),
         "detections": detections,
         "counts": dict(Counter(event["technique"] for event in events)),
         "hosts": sorted({event["host"] for event in events}),

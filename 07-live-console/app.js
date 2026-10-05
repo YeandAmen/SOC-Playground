@@ -1,5 +1,18 @@
 const TraceModel = (() => {
   const techniques = ['Attk101', 'Attk102', 'Attk103', 'Attk104'];
+  function buildSeries(observations, end, seconds, samples = 480) {
+    const values = Array(samples).fill(0);
+    const spacing = seconds / (samples - 1), sigma = Math.max(1.5, spacing * 0.65), start = end - seconds;
+    for (const event of observations) {
+      if (!Number.isFinite(event.time)) continue;
+      const position = (event.time - start) / spacing, radius = sigma * 3 / spacing;
+      for (let index = Math.max(0, Math.ceil(position - radius)); index <= Math.min(samples - 1, Math.floor(position + radius)); index += 1) {
+        const distance = (index - position) * spacing / sigma;
+        values[index] += (event.count || 1) * Math.exp(-0.5 * distance * distance);
+      }
+    }
+    return {values, maximum: Math.max(1, ...values), end, seconds, sigma};
+  }
   function buildProfiles(observations, end, seconds, samples = 480) {
     const profiles = Object.fromEntries(techniques.map(key => [key, Array(samples).fill(0)]));
     const spacing = seconds / (samples - 1), sigma = Math.max(1.5, spacing * 0.65), start = end - seconds;
@@ -16,7 +29,7 @@ const TraceModel = (() => {
   function sampleX(index, samples, end, now, seconds, width) {
     return index / (samples - 1) * width - (now - end) / seconds * width;
   }
-  return {techniques, buildProfiles, sampleX};
+  return {techniques, buildProfiles, buildSeries, sampleX};
 })();
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -28,6 +41,7 @@ let current = null;
 let selectedHours = 1;
 let captureSeconds = 900;
 let capture = null;
+let baselineCapture = null;
 let hoverFraction = null;
 let connected = false;
 let frozenTime = Date.now() / 1000;
@@ -49,13 +63,18 @@ function rebuildCapture() {
   const seconds = captureSeconds || current.hours * 3600;
   const end = Date.now() / 1000;
   let observations = current.trace_events || current.events;
+  let baselineObservations = current.trace_baseline_events || [];
   // Historical overview uses every returned bin, including events beyond the table limit.
   if (!captureSeconds) {
     observations = current.trace.flatMap((bin, index) => Object.entries(bin).map(([technique, count]) => ({
       technique, count, time: current.updated_at - current.hours * 3600 + (index + 0.5) * current.hours * 3600 / current.trace.length,
     })));
+    baselineObservations = (current.baseline_trace || []).map((count, index) => ({
+      count, time: current.updated_at - current.hours * 3600 + (index + 0.5) * current.hours * 3600 / current.baseline_trace.length,
+    })).filter(item => item.count);
   }
   capture = TraceModel.buildProfiles(observations, end, seconds);
+  baselineCapture = TraceModel.buildSeries(baselineObservations, end, seconds);
   $('axis-start').textContent = `-${seconds / 60}m`;
   $('axis-middle').textContent = `-${seconds / 120}m`;
   $('trace-caption').textContent = `${captureSeconds ? 'LIVE CAPTURE' : 'WINDOW OVERVIEW'} / ${seconds / 60} MIN`;
@@ -92,24 +111,22 @@ function drawTrace() {
   if (capture) {
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
-    const baseTrace = current?.baseline_trace;
-    if (baseTrace && baseTrace.some(v => v)) {
-      const baseMax = Math.max(1, ...baseTrace);
-      const baseSec = capture.seconds || current.hours * 3600;
-      const baseStart = capture.end - baseSec;
-      ctx.strokeStyle = '#52606860'; ctx.lineWidth = 0.5;
+    if (baselineCapture?.values?.some(v => v)) {
+      const values = baselineCapture.values;
+      const baseMax = baselineCapture.maximum;
+      ctx.strokeStyle = '#90a3ad70'; ctx.lineWidth = 0.5;
       ctx.beginPath();
-      baseTrace.forEach((value, i) => {
-        const x = (i + 0.5) / baseTrace.length * width;
+      values.forEach((value, i) => {
+        const x = TraceModel.sampleX(i, values.length, baselineCapture.end, now, baselineCapture.seconds, width);
         const amp = Math.sqrt(value / baseMax) * (center - 14) * 0.3;
         i === 0 ? ctx.moveTo(x, center - amp) : ctx.lineTo(x, center - amp);
       });
-      for (let i = baseTrace.length - 1; i >= 0; i -= 1) {
-        const x = (i + 0.5) / baseTrace.length * width;
-        const amp = Math.sqrt(baseTrace[i] / baseMax) * (center - 14) * 0.3;
+      for (let i = values.length - 1; i >= 0; i -= 1) {
+        const x = TraceModel.sampleX(i, values.length, baselineCapture.end, now, baselineCapture.seconds, width);
+        const amp = Math.sqrt(values[i] / baseMax) * (center - 14) * 0.3;
         ctx.lineTo(x, center + amp);
       }
-      ctx.closePath(); ctx.fillStyle = '#52606815'; ctx.fill(); ctx.stroke();
+      ctx.closePath(); ctx.fillStyle = '#90a3ad18'; ctx.fill(); ctx.stroke();
     }
     for (const [technique, values] of Object.entries(capture.profiles)) {
       const color = colors[technique];
@@ -167,9 +184,10 @@ function updateTraceTooltip(event) {
   const time = displayTime() - (1 - hoverFraction) * capture.seconds;
   const halfInterval = Math.max(2.5, capture.sigma);
   const matches = (current.trace_events || current.events).filter(item => Math.abs(item.time - time) <= halfInterval);
+  const normal = (current.trace_baseline_events || []).filter(item => Math.abs(item.time - time) <= halfInterval).length;
   const entries = Object.keys(colors).map(key => [key, matches.filter(item => item.technique === key).length]).filter(([, count]) => count);
   const tooltip = $('trace-tooltip');
-  tooltip.textContent = `${new Date(time * 1000).toLocaleTimeString()} / ${Math.round(halfInterval * 2)}s / ${entries.map(([key, count]) => `${key} ${count}`).join(' / ') || 'no events'}`;
+  tooltip.textContent = `${new Date(time * 1000).toLocaleTimeString()} / ${Math.round(halfInterval * 2)}s / ${entries.map(([key, count]) => `${key} ${count}`).join(' / ') || 'no anomaly'}${normal ? ` / normal ${normal}` : ''}`;
   tooltip.hidden = false;
   tooltip.style.left = `${Math.max(8, Math.min(rect.width - tooltip.offsetWidth - 8, event.clientX - rect.left + 12))}px`;
   tooltip.style.top = `${Math.max(8, event.clientY - rect.top - 34)}px`;

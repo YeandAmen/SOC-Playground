@@ -49,6 +49,14 @@ class SnapshotTests(unittest.TestCase):
         self.assertEqual(sum(bin.get("Attk101", 0) for bin in result["trace"]), 10)
         self.assertEqual(result["hosts"], ["WIN-LAB", "kali"])
 
+    def test_ssh_success_is_baseline_not_attack(self):
+        now = time.time()
+        rows = {"ssh": [{"event_epoch": now, "host": "kali", "_raw": "Accepted password for medusa from 10.0.0.7 port 50000 ssh2"}]}
+        result = server.build_snapshot(rows, 1)
+        self.assertEqual(result["total"], 0)
+        self.assertEqual(len(result["trace_baseline_events"]), 1)
+        self.assertEqual(result["detections"], [])
+
     def test_security_log_clear_is_critical(self):
         stamp = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()
         result = server.build_snapshot({"account": [{"_time": stamp, "host": "WIN-LAB", "EventCode": "1102", "_raw": "EventCode=1102"}]}, 24)

@@ -25,6 +25,14 @@ test('empty and expired activity produce no invented wave', () => {
   assert.ok(Object.values(result.profiles).flat().every(value => value === 0));
 });
 
+test('normal baseline activity also moves as a low trace', () => {
+  const result = model.buildSeries([{time: 990}, {time: 995}], 1000, 300);
+  assert.ok(Math.max(...result.values) > 0);
+  const before = model.sampleX(240, 480, result.end, 1000, result.seconds, 1200);
+  const after = model.sampleX(240, 480, result.end, 1002, result.seconds, 1200);
+  assert.equal(before - after, 8);
+});
+
 test('individual attempts remain distinct at live capture resolution', () => {
   const result = model.buildProfiles([{time: 970, technique: 'Attk101'}, {time: 985, technique: 'Attk101'}], 1000, 300);
   const middle = Math.round((977.5 - 700) / 300 * 479);

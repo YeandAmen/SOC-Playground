@@ -18,6 +18,20 @@ python3 04-attacks/Attk101_psuedoattacks.py --target <kali-ip> --user <username>
 The script logs attempt numbers and outcomes (never candidate passwords). Kali
 `/var/log/auth.log` supplies the evidence in Splunk.
 
+For a more realistic lab story, use drama mode. It runs the attacker attempts
+continuously, injects a few ordinary wrong-password mistakes, and can add normal
+successful logins if you set a lab-only valid password in the environment:
+
+```bash
+export ATTK101_VALID_PASSWORD='your-lab-only-password'
+python3 04-attacks/Attk101_psuedoattacks.py --target <kali-ip> --user <username> --wordlist 04-attacks/wordlist.txt --delay 1.5 --drama
+```
+
+The drama personas include intended source labels in the local timeline. The
+real Kali SSH log still records the network peer that opened the TCP connection.
+To make Splunk show truly different source IPs, run the script from different
+lab hosts, VPN exits, or controlled proxies.
+
 ## Attk102: local admin creation
 
 Run `Attk102_psuedoattacks.ps1` in an elevated PowerShell prompt on Windows. It

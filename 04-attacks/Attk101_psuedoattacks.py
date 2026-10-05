@@ -6,17 +6,17 @@
 #
 # Usage:
 #   python3 Attk101_psuedoattacks.py --target <host> --user <user> --wordlist wordlist.txt
-import argparse, datetime, sys, time, random
+import argparse, datetime, os, sys, time, random
 
 LOGFILE = "attk101_timeline.log"
 
 # Simulated source personas
 PERSONAS = [
-    {"name": "persistent_attacker", "ip": "198.51.100.22",  "weight": 60},
-    {"name": "scanbot_dhaka",       "ip": "103.45.12.88",   "weight": 15},
-    {"name": "proxy_moscow",        "ip": "91.200.14.55",   "weight": 10},
-    {"name": "tor_exit_ams",        "ip": "45.67.89.12",    "weight": 10},
-    {"name": "legit_admin",         "ip": "10.10.10.5",     "weight": 5},
+    {"name": "persistent_attacker", "ip": "198.51.100.22"},
+    {"name": "mistyped_helpdesk",   "ip": "10.20.10.15"},
+    {"name": "contractor_laptop",   "ip": "10.20.30.44"},
+    {"name": "legit_admin",         "ip": "10.20.40.8"},
+    {"name": "build_runner",        "ip": "10.20.50.19"},
 ]
 
 def ts():
@@ -27,18 +27,6 @@ def log(line):
     print(msg, flush=True)
     with open(LOGFILE, "a") as f:
         f.write(msg + "\n")
-
-def select_source(use_drama):
-    """Pick a source persona based on weights (simulates different attacker IPs)."""
-    if not use_drama:
-        return PERSONAS[0]
-    r = random.randint(1, 100)
-    cumulative = 0
-    for p in PERSONAS:
-        cumulative += p["weight"]
-        if r <= cumulative:
-            return p
-    return PERSONAS[-1]
 
 def try_login(target, port, user, pw, persona):
     """Attempt SSH auth, returns (success, detail)."""
@@ -66,7 +54,10 @@ def main():
     ap.add_argument("--user", required=True)
     ap.add_argument("--wordlist", required=True)
     ap.add_argument("--delay", type=float, default=0.5)
-    ap.add_argument("--drama", action="store_true", help="Enable multi-IP drama simulation")
+    ap.add_argument("--drama", action="store_true", help="Mix persistent attacker, light mistakes, and normal login attempts")
+    ap.add_argument("--normal-every", type=int, default=5, help="In drama mode, attempt a normal login every N attack attempts")
+    ap.add_argument("--valid-password-env", default="ATTK101_VALID_PASSWORD", help="Env var containing a lab-only valid password for normal-login noise")
+    ap.add_argument("--mistakes", type=int, default=3, help="Total wrong-password background mistakes in drama mode")
     args = ap.parse_args()
 
     try:
@@ -81,9 +72,14 @@ def main():
     log(f"[Attk101] START | target={args.target}:{args.port} user={args.user} "
         f"attempts={len(words)} drama={args.drama}")
 
+    if args.drama:
+        log("[Attk101] NOTE | drama personas are intent labels. Real sshd source IP is the network peer; run from separate hosts/proxies for true multi-source Splunk IPs.")
+
     hits = 0
+    mistakes_left = max(0, args.mistakes)
+    normal_password = os.environ.get(args.valid_password_env, "")
     for i, pw in enumerate(words, 1):
-        persona = select_source(args.drama)
+        persona = PERSONAS[0]
         log_prefix = f"src={persona['ip']} actor={persona['name']}"
 
         ok, detail = try_login(args.target, args.port, args.user, pw, persona)
@@ -94,33 +90,25 @@ def main():
         else:
             log(f"[Attk101] FAIL attempt={i} {log_prefix}")
 
-        # Drama: randomly inject extra failed attempts from different IPs
-        if args.drama and i % 3 == 0:
-            extra_p = select_source(True)
+        if args.drama and mistakes_left and i in {2, 4, 7, 11, 16, 23}:
+            extra_p = PERSONAS[1 + (args.mistakes - mistakes_left) % 2]
             extra_log = f"src={extra_p['ip']} actor={extra_p['name']}"
-            try:
-                import paramiko
-                c2 = paramiko.SSHClient()
-                c2.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                c2.connect(args.target, port=args.port, username=args.user,
-                          password=f"random_drama_{random.randint(100,999)}",
-                          timeout=3, allow_agent=False, look_for_keys=False,
-                          banner_timeout=3, auth_timeout=3)
-                c2.close()
-            except paramiko.AuthenticationException:
+            ok_noise, _ = try_login(args.target, args.port, args.user, f"mistype_{random.randint(100,999)}", extra_p)
+            if ok_noise:
+                log(f"[Attk101] DRAMA-NOISE-SUCCESS {extra_log} unexpected=true")
+            else:
                 log(f"[Attk101] DRAMA-FAIL {extra_log}")
-            except Exception:
-                log(f"[Attk101] DRAMA-ERROR {extra_log}")
+            mistakes_left -= 1
+            time.sleep(0.3)
+
+        if args.drama and normal_password and args.normal_every > 0 and i % args.normal_every == 0:
+            normal_p = PERSONAS[3 + (i // args.normal_every) % 2]
+            normal_log = f"src={normal_p['ip']} actor={normal_p['name']}"
+            ok_normal, _ = try_login(args.target, args.port, args.user, normal_password, normal_p)
+            log(f"[Attk101] DRAMA-NORMAL {'SUCCESS' if ok_normal else 'FAIL'} attempt={i} {normal_log} credential_valid={str(ok_normal).lower()}")
             time.sleep(0.3)
 
         time.sleep(args.delay)
-
-    # Drama: add a legitimate-looking login from a trusted IP after attack
-    if args.drama:
-        legit_p = PERSONAS[4]
-        log(f"[Attk101] DRAMA-LEGIT src={legit_p['ip']} actor={legit_p['name']} "
-            f"user={args.user} action=normal_auth")
-        time.sleep(0.5)
 
     log(f"[Attk101] END | target={args.target} attempts={len(words)} valid={hits} drama={args.drama}")
     print(f"\n[*] Done. Timeline in {LOGFILE}")

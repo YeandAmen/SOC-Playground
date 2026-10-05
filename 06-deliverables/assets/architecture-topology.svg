@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1120" viewBox="0 0 1800 1120" role="img" aria-labelledby="title desc">
+  <title id="title">SOC Playground Architecture Topology</title>
+  <desc id="desc">Splunk Manager on macOS connected to Windows and Kali endpoints on an isolated UTM network, with Universal Forwarder telemetry flowing to Splunk and attack simulation flows shown.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f7fafc"/>
+      <stop offset="1" stop-color="#eef3f6"/>
+    </linearGradient>
+    <linearGradient id="splunk" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#12343b"/>
+      <stop offset="1" stop-color="#0b1f26"/>
+    </linearGradient>
+    <linearGradient id="endpoint" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f3f7fa"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#0b1f26" flood-opacity="0.16"/>
+    </filter>
+    <marker id="arrowTelemetry" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1d7f6e"/>
+    </marker>
+    <marker id="arrowAttack" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b84b4b"/>
+    </marker>
+    <style>
+      .title { font: 800 44px ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #102027; letter-spacing: 0; }
+      .subtitle { font: 500 21px ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #52646d; letter-spacing: 0; }
+      .label { font: 800 28px ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #102027; letter-spacing: 0; }
+      .labelLight { font: 800 29px ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #f7fbfc; letter-spacing: 0; }
+      .small { font: 500 20px ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #43535b; letter-spacing: 0; }
+      .smallLight { font: 500 20px ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #d9e7ea; letter-spacing: 0; }
+      .mono { font: 700 21px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #19323a; letter-spacing: 0; }
+      .monoLight { font: 700 21px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #bdf5e6; letter-spacing: 0; }
+      .boundary { fill: #ffffff; stroke: #9fb3bd; stroke-width: 2.5; stroke-dasharray: 12 12; }
+      .card { fill: url(#endpoint); stroke: #b7c8d0; stroke-width: 2; }
+      .chip { fill: #e9f2f4; stroke: #c4d3da; stroke-width: 1.5; }
+      .chipText { font: 700 18px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #31444c; letter-spacing: 0; }
+      .telemetry { fill: none; stroke: #1d7f6e; stroke-width: 6; marker-end: url(#arrowTelemetry); }
+      .attack { fill: none; stroke: #b84b4b; stroke-width: 5; stroke-dasharray: 14 10; marker-end: url(#arrowAttack); }
+      .console { fill: none; stroke: #45616c; stroke-width: 4; marker-end: url(#arrowTelemetry); }
+      .flowText { font: 800 19px ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #1d6158; letter-spacing: 0; }
+      .attackText { font: 800 19px ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #9b3c3c; letter-spacing: 0; }
+    </style>
+  </defs>
+
+  <rect width="1800" height="1120" fill="url(#bg)"/>
+  <text x="86" y="88" class="title">SOC Playground Architecture Topology</text>
+  <text x="88" y="126" class="subtitle">Isolated UTM lab network with Splunk Enterprise manager, Windows endpoint, Kali endpoint,</text>
+  <text x="88" y="154" class="subtitle">telemetry forwarding, and controlled attack simulation flows.</text>
+
+  <rect x="70" y="190" width="1660" height="775" rx="28" class="boundary"/>
+  <text x="104" y="235" class="label">UTM Shared Virtual Network</text>
+  <text x="104" y="269" class="mono">Subnet: 192.168.64.0/24</text>
+
+  <rect x="675" y="304" width="450" height="340" rx="24" fill="url(#splunk)" filter="url(#shadow)"/>
+  <text x="723" y="360" class="labelLight">macOS Host</text>
+  <text x="723" y="397" class="smallLight">Splunk Enterprise Manager</text>
+  <text x="723" y="435" class="monoLight">IP 192.168.64.1</text>
+  <rect x="723" y="466" width="166" height="42" rx="10" fill="#173f48" stroke="#32636b"/>
+  <text x="742" y="493" class="monoLight">8000 Web</text>
+  <rect x="906" y="466" width="170" height="42" rx="10" fill="#173f48" stroke="#32636b"/>
+  <text x="925" y="493" class="monoLight">9997 UF In</text>
+  <rect x="723" y="522" width="166" height="42" rx="10" fill="#173f48" stroke="#32636b"/>
+  <text x="742" y="549" class="monoLight">8089 Mgmt</text>
+  <text x="723" y="598" class="smallLight">Roles: indexer, search head, receiver</text>
+  <text x="723" y="628" class="smallLight">Local console: SignalScope on 127.0.0.1:8765</text>
+
+  <rect x="165" y="332" width="385" height="290" rx="22" class="card" filter="url(#shadow)"/>
+  <text x="212" y="385" class="label">Windows 11 VM</text>
+  <text x="212" y="423" class="mono">IP 192.168.64.2</text>
+  <text x="212" y="466" class="small">Endpoint telemetry source</text>
+  <rect x="212" y="497" width="120" height="40" rx="10" class="chip"/>
+  <text x="232" y="523" class="chipText">Sysmon</text>
+  <rect x="348" y="497" width="154" height="40" rx="10" class="chip"/>
+  <text x="367" y="523" class="chipText">Splunk UF</text>
+  <text x="212" y="575" class="small">Security, System, Application, Sysmon Operational</text>
+
+  <rect x="1250" y="332" width="385" height="290" rx="22" class="card" filter="url(#shadow)"/>
+  <text x="1296" y="385" class="label">Kali Linux VM</text>
+  <text x="1296" y="423" class="mono">IP 192.168.64.4</text>
+  <text x="1296" y="466" class="small">Monitored Linux endpoint</text>
+  <rect x="1296" y="497" width="122" height="40" rx="10" class="chip"/>
+  <text x="1317" y="523" class="chipText">OpenSSH</text>
+  <rect x="1434" y="497" width="154" height="40" rx="10" class="chip"/>
+  <text x="1453" y="523" class="chipText">Splunk UF</text>
+  <text x="1296" y="575" class="small">/var/log/auth.log and /var/log/syslog</text>
+
+  <rect x="700" y="745" width="400" height="130" rx="22" fill="#ffffff" stroke="#b7c8d0" stroke-width="2" filter="url(#shadow)"/>
+  <text x="750" y="795" class="label">SOC Analyst</text>
+  <text x="750" y="832" class="small">Splunk dashboard + SignalScope</text>
+  <text x="750" y="862" class="mono">127.0.0.1:8765 / 192.168.64.1:8000</text>
+
+  <path d="M 550 468 C 620 448, 628 448, 675 458" class="telemetry"/>
+  <text x="526" y="425" class="flowText">WinEventLog + Sysmon</text>
+  <text x="585" y="454" class="flowText">UF -> 9997</text>
+
+  <path d="M 1250 468 C 1184 448, 1176 448, 1125 458" class="telemetry"/>
+  <text x="1140" y="425" class="flowText">auth.log + syslog</text>
+  <text x="1178" y="454" class="flowText">UF -> 9997</text>
+
+  <path d="M 1042 640 C 1175 735, 1370 728, 1434 622" class="attack"/>
+  <text x="1188" y="725" class="attackText">Attk101 SSH attempts</text>
+  <text x="1245" y="752" class="attackText">Mac -> Kali :22</text>
+
+  <path d="M 760 640 C 625 735, 410 722, 350 622" class="attack"/>
+  <text x="365" y="728" class="attackText">Attk102/Attk103/Attk104</text>
+  <text x="391" y="755" class="attackText">controlled Windows tests</text>
+
+  <path d="M 900 745 L 900 650" class="console"/>
+  <text x="928" y="704" class="flowText">searches, dashboards, live trace</text>
+
+  <rect x="110" y="1000" width="1580" height="70" rx="18" fill="#e7eff2" stroke="#c5d5dc"/>
+  <text x="140" y="1029" class="small">Security boundary: lab telemetry stays inside the isolated UTM network.</text>
+  <text x="140" y="1056" class="small">Splunk receives endpoint logs on TCP 9997; analyst views Splunk Web on TCP 8000 and SignalScope on local TCP 8765.</text>
+</svg>

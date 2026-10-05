@@ -73,6 +73,7 @@
 | rex field=_raw max_match=1 "Group Name:\s+(?&lt;group_name&gt;[^\r\n]+)"
 | table _time, host, action, actor, target, group_name | sort - _time</query>
           <earliest>-48h@h</earliest><latest>@h</latest>
+          <option name="count">50</option>
         </search>
       </table>
     </panel>
@@ -85,9 +86,8 @@
       <table>
         <search>
           <query>index=soc_capstone DownloadString earliest="10/04/2026:00:00:00" latest="10/05/2026:12:00:00"
-| rex field=_raw max_match=1 "(?&lt;url&gt;http://192\.168\.64\.1[^\s\"\)]+)" 
-| eval url=mvindex(rex_match,0)
-| table _time, host, url | sort - _time</query>
+| rex field=_raw max_match=1 "(?&lt;target_url&gt;http://192\.168\.64\.1[^\s\"\)]+)"
+| table _time, host, target_url | sort - _time</query>
           <earliest>-48h@h</earliest><latest>@h</latest>
         </search>
       </table>
